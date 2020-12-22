@@ -1,9 +1,9 @@
 {
   "manifestVersion": 1,
-  "version": "1.0.0",
+  "version": "1.0.2",
   "name": "Hot Reload and Debug",
   "description": "Use hot reload and debug directly in VS Code",
-  "publisher": "microsoft",
+  "publisher": "VeroBiotech",
   "demands": ["api-version/3.0"],
   "categories": ["Azure Repos"],
   "targets": [
@@ -44,11 +44,29 @@
       }
     },
     {
-      "id": "default-hub",
+      "id": "hub",
       "type": "ms.vss-web.hub",
       "targets": [".hello-world-hub-group"],
+      "includes": [
+          "ms.vss-tfs-web.tfs-page-data-service",
+          "ms.vss-features.host-navigation-service",
+          "ms.vss-features.extension-data-service",
+          "ms.vss-features.host-dialog-service"
+      ],
       "properties": {
-        "uri": "dist/hub/hub.html"
+          "name": "Sample hub",
+          "uri": "dist/Hub/Hub.html",
+          "icon": "asset://static/sample-icon.png",
+          "supportsMobile": true
+      }
+    },
+    {
+      "id": "work-item-validation-form-group",
+      "type": "ms.vss-work-web.work-item-form-group",
+      "targets": ["ms.vss-work-web.work-item-form"],
+      "properties": {
+          "uri": "dist/WorkItemFormGroup/WorkItemFormGroup.html",
+          "height": 600
       }
     }
   ]
