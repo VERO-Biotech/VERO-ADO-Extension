@@ -1,101 +1,86 @@
-import {
-  IWorkItemChangedArgs,
-  IWorkItemFieldChangedArgs,
-  IWorkItemFormService,
-  IWorkItemLoadedArgs,
-  WorkItemTrackingServiceIds
-} from "azure-devops-extension-api/WorkItemTracking";
 import * as SDK from "azure-devops-extension-sdk";
-import { Button } from "azure-devops-ui/Button";
+import { ObservableValue } from "azure-devops-ui/Core/Observable";
+import { ListSelection, SimpleList } from "azure-devops-ui/List";
+import { DetailsPanel, MasterPanel } from "azure-devops-ui/MasterDetails";
+import {
+  BaseMasterDetailsContext,
+  IMasterDetailsContext,
+  IMasterDetailsContextLayer,
+  MasterDetailsContext,
+} from "azure-devops-ui/MasterDetailsContext";
+import { ArrayItemProvider } from "azure-devops-ui/Utilities/Provider";
 import * as React from "react";
 import { showRootComponent } from "../Common";
+import { IVerificationInfo, verificationHistory } from "./Data";
+import { registerEvents } from "./EventHandling";
+import "./MasterDetail.Example.css";
+import { InitialDetailView } from "./WorkItemFormGroup.Details";
+import { InitialMasterPanelContent } from "./WorkItemFormGroup.Master";
 
-interface WorkItemFormGroupComponentState {
-  eventContent: string;
+const initialPayload: IMasterDetailsContextLayer<
+  IVerificationInfo,
+  undefined
+> = {
+  key: "initial",
+  masterPanelContent: {
+    renderContent: (parentItem, initialSelectedMasterItem) => (
+      <InitialMasterPanelContent
+        initialSelectedMasterItem={initialSelectedMasterItem}
+      />
+    ),
+    //renderHeader: () => <MasterPanelHeader title={"Validation History"} />,
+    hideBackButton: true,
+  },
+  detailsContent: {
+    renderContent: (item) => <InitialDetailView detailItem={item} />,
+  },
+  selectedMasterItem: new ObservableValue<IVerificationInfo>(
+    verificationHistory[0]
+  ),
+  parentItem: undefined,
+};
+
+const masterDetailsContext: IMasterDetailsContext = new BaseMasterDetailsContext(
+  initialPayload,
+  () => {
+    alert("Triggered onExit");
+  }
+);
+
+export interface WorkItemFormGroupComponentState {
+  eventContent: string[];
 }
-
-class WorkItemFormGroupComponent extends React.Component<{},  WorkItemFormGroupComponentState> {
+class WorkItemFormGroupComponent extends React.Component<
+  {},
+  WorkItemFormGroupComponentState
+> {
   constructor(props: {}) {
     super(props);
     this.state = {
-      eventContent: ""
+      eventContent: [],
     };
   }
 
   public componentDidMount() {
     SDK.init().then(() => {
-      this.registerEvents();
+      registerEvents(this);
     });
   }
+
+  private selection = new ListSelection(true);
 
   public render(): JSX.Element {
     return (
-      <div>
-        <Button
-          className="sample-work-item-button"
-          text="Click me to change title!"
-          onClick={() => this.onClick()}
+      <MasterDetailsContext.Provider value={masterDetailsContext}>
+        <div className="flex-row" style={{ display: "flex", width: "100%" }}>
+          <MasterPanel className="master-example-panel" />
+          <DetailsPanel />
+        </div>
+        <SimpleList
+          itemProvider={new ArrayItemProvider<string>(this.state.eventContent)}
+          selection={this.selection}
         />
-        <div className="sample-work-item-events">{this.state.eventContent}</div>
-      </div>
-    );
-  }
-
-  private registerEvents() {
-    SDK.register(SDK.getContributionId(), () => {
-      return {
-        // Called when the active work item is modified
-        onFieldChanged: (args: IWorkItemFieldChangedArgs) => {
-          this.setState({
-            eventContent: `onFieldChanged - ${JSON.stringify(args)}`
-          });
-        },
-
-        // Called when a new work item is being loaded in the UI
-        onLoaded: (args: IWorkItemLoadedArgs) => {
-          this.setState({
-            eventContent: `onLoaded - ${JSON.stringify(args)}`
-          });
-        },
-
-        // Called when the active work item is being unloaded in the UI
-        onUnloaded: (args: IWorkItemChangedArgs) => {
-          this.setState({
-            eventContent: `onUnloaded - ${JSON.stringify(args)}`
-          });
-        },
-
-        // Called after the work item has been saved
-        onSaved: (args: IWorkItemChangedArgs) => {
-          this.setState({
-            eventContent: `onSaved - ${JSON.stringify(args)}`
-          });
-        },
-
-        // Called when the work item is reset to its unmodified state (undo)
-        onReset: (args: IWorkItemChangedArgs) => {
-          this.setState({
-            eventContent: `onReset - ${JSON.stringify(args)}`
-          });
-        },
-
-        // Called when the work item has been refreshed from the server
-        onRefreshed: (args: IWorkItemChangedArgs) => {
-          this.setState({
-            eventContent: `onRefreshed - ${JSON.stringify(args)}`
-          });
-        }
-      };
-    });
-  }
-
-  private async onClick() {
-    const workItemFormService = await SDK.getService<IWorkItemFormService>(
-      WorkItemTrackingServiceIds.WorkItemFormService
-    );
-    workItemFormService.setFieldValue(
-      "System.Title",
-      "Title set from your group extension!"
+      </MasterDetailsContext.Provider>
     );
   }
 }

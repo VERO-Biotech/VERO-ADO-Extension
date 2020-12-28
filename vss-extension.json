@@ -1,6 +1,6 @@
 {
   "manifestVersion": 1,
-  "version": "1.0.2",
+  "version": "1.0.5",
   "name": "Hot Reload and Debug",
   "description": "Use hot reload and debug directly in VS Code",
   "publisher": "VeroBiotech",
@@ -65,6 +65,7 @@
       "type": "ms.vss-work-web.work-item-form-group",
       "targets": ["ms.vss-work-web.work-item-form"],
       "properties": {
+          "name": "Validation Group",
           "uri": "dist/WorkItemFormGroup/WorkItemFormGroup.html",
           "height": 600
       }
