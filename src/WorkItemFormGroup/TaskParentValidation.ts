@@ -1,13 +1,10 @@
 import {
-    IWorkItemChangedArgs,
-    IWorkItemFieldChangedArgs,
     IWorkItemFormService,
-    IWorkItemLoadedArgs,
     WorkItemTrackingServiceIds
 } from "azure-devops-extension-api/WorkItemTracking";
-
-
 import * as SDK from "azure-devops-extension-sdk";
+
+
 
 export const checkParentIfTask = async () => {
     // Set an error if we have a Task and the System.Parent value is null

@@ -3,17 +3,17 @@ import {
   IListItemDetails,
   List,
   ListItem,
-  ListSelection,
+  ListSelection
 } from "azure-devops-ui/List";
 import {
   bindSelectionToObservable,
-  MasterDetailsContext,
+  MasterDetailsContext
 } from "azure-devops-ui/MasterDetailsContext";
 import {
   IStatusProps,
   Status,
   Statuses,
-  StatusSize,
+  StatusSize
 } from "azure-devops-ui/Status";
 import { Tooltip } from "azure-devops-ui/TooltipEx";
 import { ArrayItemProvider } from "azure-devops-ui/Utilities/Provider";
@@ -31,7 +31,7 @@ const mapStatus = (verificationStatus: string): IStatusProps => {
   return Statuses.Queued;
 };
 
-export const renderInitialRow = (
+const renderInitialRow = (
   index: number,
   item: IVerificationInfo,
   details: IListItemDetails<IVerificationInfo>,

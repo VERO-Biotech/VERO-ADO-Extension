@@ -13,9 +13,9 @@ import * as React from "react";
 import { showRootComponent } from "../Common";
 import { IVerificationInfo, verificationHistory } from "./Data";
 import { registerEvents } from "./EventHandling";
+import { InitialDetailView } from "./InitialDetailView";
+import { InitialMasterPanelContent } from "./InitialMasterPanelContent";
 import "./MasterDetail.Example.css";
-import { InitialDetailView } from "./WorkItemFormGroup.Details";
-import { InitialMasterPanelContent } from "./WorkItemFormGroup.Master";
 
 const initialPayload: IMasterDetailsContextLayer<
   IVerificationInfo,
