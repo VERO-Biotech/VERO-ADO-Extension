@@ -1,31 +1,38 @@
-import {
-    IWorkItemFormService,
-    WorkItemTrackingServiceIds
-} from "azure-devops-extension-api/WorkItemTracking";
-import * as SDK from "azure-devops-extension-sdk";
-
-
+import { getWorkItemService, fieldNames, workItemTypes } from "./Common";
 
 export const checkParentIfTask = async () => {
-    // Set an error if we have a Task and the System.Parent value is null
-    const workItemFormService = await SDK.getService<IWorkItemFormService>(
-        WorkItemTrackingServiceIds.WorkItemFormService
-    );
-    const values = await workItemFormService.getFieldValues(["System.Parent", "System.WorkItemType"]);
+  // Set an error if we have a Task and the System.Parent value is null
+  const workItemFormService = await getWorkItemService();
+  const values = await getParentAndItemTypeValues();
 
-    if (values["System.WorkItemType"] === "Task" && values["System.Parent"] === null) {
-        workItemFormService.setError("Parent is required for a Task Work Item, please add a parent link in the Related Work section");
-    }
+  if (
+    values[fieldNames.workItemType] === workItemTypes.task &&
+    values[fieldNames.parent] === null
+  ) {
+    workItemFormService.setError(
+      "Parent is required for a Task Work Item, please add a parent link in the Related Work section"
+    );
+  }
 };
 
 export const clearTaskMissingParentError = async () => {
-    // Clear the error that we set if the parent is set
-    const workItemFormService = await SDK.getService<IWorkItemFormService>(
-        WorkItemTrackingServiceIds.WorkItemFormService
-    );
-    const values = await workItemFormService.getFieldValues(["System.Parent", "System.WorkItemType"]);
+  // Clear the error that we set if the parent is set
+  const workItemFormService = await getWorkItemService();
+  const values = await getParentAndItemTypeValues();
 
-    if (values["System.WorkItemType"] === "Task" && values["System.Parent"] !== null) {
-        workItemFormService.clearError();
-    }
+  if (
+    values[fieldNames.workItemType] === workItemTypes.task &&
+    values[fieldNames.parent] !== null
+  ) {
+    workItemFormService.clearError();
+  }
+};
+
+const getParentAndItemTypeValues = async () => {
+  const workItemFormService = await getWorkItemService();
+
+  return workItemFormService.getFieldValues(
+    [fieldNames.parent, fieldNames.workItemType],
+    { returnOriginalValue: false }
+  );
 };

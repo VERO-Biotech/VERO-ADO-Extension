@@ -1,14 +1,13 @@
 import * as SDK from "azure-devops-extension-sdk";
 import { ObservableValue } from "azure-devops-ui/Core/Observable";
-import { ListSelection, SimpleList } from "azure-devops-ui/List";
+import { ListSelection } from "azure-devops-ui/List";
 import { DetailsPanel, MasterPanel } from "azure-devops-ui/MasterDetails";
 import {
   BaseMasterDetailsContext,
   IMasterDetailsContext,
   IMasterDetailsContextLayer,
-  MasterDetailsContext,
+  MasterDetailsContext
 } from "azure-devops-ui/MasterDetailsContext";
-import { ArrayItemProvider } from "azure-devops-ui/Utilities/Provider";
 import * as React from "react";
 import { showRootComponent } from "../Common";
 import { IVerificationInfo, verificationHistory } from "./Data";
@@ -53,7 +52,7 @@ export interface WorkItemFormGroupComponentState {
 class WorkItemFormGroupComponent extends React.Component<
   {},
   WorkItemFormGroupComponentState
-> {
+  > {
   constructor(props: {}) {
     super(props);
     this.state = {
@@ -76,10 +75,10 @@ class WorkItemFormGroupComponent extends React.Component<
           <MasterPanel className="master-example-panel" />
           <DetailsPanel />
         </div>
-        <SimpleList
+        {/*<SimpleList
           itemProvider={new ArrayItemProvider<string>(this.state.eventContent)}
           selection={this.selection}
-        />
+        />*/}
       </MasterDetailsContext.Provider>
     );
   }

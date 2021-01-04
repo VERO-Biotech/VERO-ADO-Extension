@@ -1,30 +1,33 @@
-import { IObservableValue } from "azure-devops-ui/Core/Observable";
+import {
+  IObservableValue,
+  ObservableArray,
+} from "azure-devops-ui/Core/Observable";
 import {
   IListItemDetails,
   List,
   ListItem,
-  ListSelection
+  ListSelection,
 } from "azure-devops-ui/List";
 import {
   bindSelectionToObservable,
-  MasterDetailsContext
+  MasterDetailsContext,
 } from "azure-devops-ui/MasterDetailsContext";
 import {
   IStatusProps,
   Status,
   Statuses,
-  StatusSize
+  StatusSize,
 } from "azure-devops-ui/Status";
 import { Tooltip } from "azure-devops-ui/TooltipEx";
-import { ArrayItemProvider } from "azure-devops-ui/Utilities/Provider";
 import * as React from "react";
+import { fieldNames, getWorkItemService, verificationStatus } from "./Common";
 import { IVerificationInfo, verificationHistory } from "./Data";
 
-const mapStatus = (verificationStatus: string): IStatusProps => {
-  switch (verificationStatus) {
-    case "Passed":
+const mapStatus = (status: string): IStatusProps => {
+  switch (status) {
+    case verificationStatus.passed:
       return Statuses.Success;
-    case "Failed":
+    case verificationStatus.failed:
       return Statuses.Failed;
   }
   // Return blank status if no mapping found
@@ -57,7 +60,7 @@ const renderInitialRow = (
         >
           <Tooltip overflowOnly={true}>
             <div className="primary-text text-ellipsis">
-              {item.status} - {item.dateOfVerification}
+              {item.status} - {item.dateOfVerification.toLocaleString()}
             </div>
           </Tooltip>
           <Tooltip overflowOnly={true}>
@@ -69,33 +72,60 @@ const renderInitialRow = (
   );
 };
 
+export const items = new ObservableArray(verificationHistory);
+export const selection = new ListSelection({ selectOnFocus: false });
+
 export const InitialMasterPanelContent: React.FunctionComponent<{
   initialSelectedMasterItem: IObservableValue<IVerificationInfo>;
 }> = (props) => {
-  const [initialItemProvider] = React.useState(
-    new ArrayItemProvider(verificationHistory)
-  );
-  const [initialSelection] = React.useState(
-    new ListSelection({ selectOnFocus: false })
-  );
+  const [initialItemProvider] = React.useState(items);
   const masterDetailsContext = React.useContext(MasterDetailsContext);
 
   React.useEffect(() => {
     bindSelectionToObservable(
-      initialSelection,
+      selection,
       initialItemProvider,
       props.initialSelectedMasterItem
     );
   });
 
+  const getVerificationHistory = async () => {
+    const workItemFormService = await getWorkItemService();
+    const fieldValue = await workItemFormService.getFieldValue(
+      fieldNames.validationHistory,
+      { returnOriginalValue: false }
+    );
+
+    const jsonData = fieldValue
+      .toString()
+      .replace(/(?<!=)&quot;/g, '"')
+      .replace(/["]?%5c%22["]?/g, '\\"');
+
+    const itemsData: IVerificationInfo[] = JSON.parse(jsonData);
+
+    itemsData.forEach((item) => {
+      item.details = decodeURIComponent(item.details);
+      item.dateOfVerification = new Date(item.dateOfVerification);
+    });
+
+    items.value = itemsData;
+    selection.select(0);
+  };
+
+  React.useEffect(() => {
+    getVerificationHistory();
+  }, []);
+
   return (
     <List
       ariaLabel={"Validation history entries"}
       itemProvider={initialItemProvider}
-      selection={initialSelection}
+      selection={selection}
       renderRow={renderInitialRow}
       width="100%"
-      onSelect={() => masterDetailsContext.setDetailsPanelVisbility(true)}
+      onSelect={() => {
+        masterDetailsContext.setDetailsPanelVisbility(true);
+      }}
     />
   );
 };

@@ -6,6 +6,7 @@ import { Page } from "azure-devops-ui/Page";
 import { ScreenSizeObserver } from "azure-devops-ui/Utilities/ScreenSize";
 import * as React from "react";
 import { IVerificationInfo } from "./Data";
+import ReactHtmlParser from "react-html-parser";
 
 export const InitialDetailView: React.FunctionComponent<{
   detailItem: IVerificationInfo;
@@ -20,7 +21,9 @@ export const InitialDetailView: React.FunctionComponent<{
           const showBackButton = screenSizeProps.screenSize <= ScreenSize.small;
           return (
             <Header
-              description={`Verified by ${detailItem.verifiedBy} on ${detailItem.dateOfVerification}`}
+              description={`Verified by ${
+                detailItem.verifiedBy
+              } on ${detailItem.dateOfVerification.toLocaleString()}`}
               descriptionClassName="description-primary-text margin-bottom-8"
               title={detailItem.status}
               titleClassName="details-view-title margin-bottom-8"
@@ -38,7 +41,7 @@ export const InitialDetailView: React.FunctionComponent<{
         }}
       </ScreenSizeObserver>
       <div className="page-content page-content-top">
-        <Card>{detailItem.details}</Card>
+        <Card>{ReactHtmlParser(detailItem.details)}</Card>
       </div>
     </Page>
   );

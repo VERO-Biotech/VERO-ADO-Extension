@@ -1,16 +1,14 @@
 {
   "manifestVersion": 1,
-  "version": "1.0.5",
+  "version": "1.0.11",
   "name": "Hot Reload and Debug",
   "description": "Use hot reload and debug directly in VS Code",
   "publisher": "VeroBiotech",
   "demands": ["api-version/3.0"],
   "categories": ["Azure Repos"],
-  "targets": [
-    {
-      "id": "Microsoft.VisualStudio.Services"
-    }
-  ],
+  "targets": [{
+    "id": "Microsoft.VisualStudio.Services"
+  }],
   "content": {
     "details": {
       "path": "README.md"
@@ -19,8 +17,7 @@
   "icons": {
     "default": "img/world.png"
   },
-  "files": [
-    {
+  "files": [{
       "path": "dist",
       "addressable": true
     },
@@ -29,8 +26,7 @@
       "addressable": true
     }
   ],
-  "contributions": [
-    {
+  "contributions": [{
       "id": "hello-world-hub-group",
       "type": "ms.vss-web.hub-group",
       "description": "Sample hub group",
@@ -48,26 +44,39 @@
       "type": "ms.vss-web.hub",
       "targets": [".hello-world-hub-group"],
       "includes": [
-          "ms.vss-tfs-web.tfs-page-data-service",
-          "ms.vss-features.host-navigation-service",
-          "ms.vss-features.extension-data-service",
-          "ms.vss-features.host-dialog-service"
+        "ms.vss-tfs-web.tfs-page-data-service",
+        "ms.vss-features.host-navigation-service",
+        "ms.vss-features.extension-data-service",
+        "ms.vss-features.host-dialog-service"
       ],
       "properties": {
-          "name": "Sample hub",
-          "uri": "dist/Hub/Hub.html",
-          "icon": "asset://static/sample-icon.png",
-          "supportsMobile": true
+        "name": "Sample hub",
+        "uri": "dist/Hub/Hub.html",
+        "icon": "asset://static/sample-icon.png",
+        "supportsMobile": true
       }
     },
     {
-      "id": "work-item-validation-form-group",
-      "type": "ms.vss-work-web.work-item-form-group",
+      "id": "work-item-verification-form-group",
+      "type": "ms.vss-work-web.work-item-form-control",
       "targets": ["ms.vss-work-web.work-item-form"],
       "properties": {
-          "name": "Validation Group",
-          "uri": "dist/WorkItemFormGroup/WorkItemFormGroup.html",
-          "height": 600
+        "name": "Verification Group",
+        "uri": "dist/WorkItemFormGroup/WorkItemFormGroup.html",
+        "height": 600,
+        "inputs": [{
+            "id": "FieldName",
+            "label": "Select the field for this control. This is the only input needed if the field is a picklist field with suggested values.",
+            "type": "WorkItemField",
+            "properties": {
+              "workItemFieldTypes": ["String", "PlainText", "HTML"]
+            },
+            "validation": {
+              "dataType": "String",
+              "isRequired": true
+            }
+          }
+        ]
       }
     }
   ]

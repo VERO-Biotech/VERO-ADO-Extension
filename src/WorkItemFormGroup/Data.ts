@@ -1,45 +1,52 @@
 export interface IVerificationInfo {
   verifiedBy: string;
   status: string;
-  dateOfVerification: string;
+  dateOfVerification: Date;
   details: string;
 }
 
 export const verificationHistory: IVerificationInfo[] = [
   {
-    verifiedBy: "Byron Benitez",
+    verifiedBy: "",
+    status: "",
+    dateOfVerification: new Date(),
+    details: "",
+  },
+
+  /*{
+    verifiedBy: "Byron Benitez <byron.benitez@vero-biotech.com>",
     status: "Passed",
-    dateOfVerification: "12/22/2020 12:00 AM",
+    dateOfVerification: new Date(2020, 12, 22, 12, 0),
     details: "This validation item has passed, verified success",
   },
   {
-    verifiedBy: "Byron Benitez",
+    verifiedBy: "Byron Benitez <byron.benitez@vero-biotech.com>",
     status: "Failed",
-    dateOfVerification: "12/21/2020 12:00 AM",
+    dateOfVerification: new Date(2020, 12, 21, 12, 0),
     details: "This validation item failed",
   },
   {
-    verifiedBy: "Byron Benitez",
+    verifiedBy: "Byron Benitez <byron.benitez@vero-biotech.com>",
     status: "Passed",
-    dateOfVerification: "12/20/2020 12:00 AM",
+    dateOfVerification: new Date(2020, 12, 20, 12, 0),
     details: "This validation item has passed, verified!",
   },
   {
-    verifiedBy: "Byron Benitez",
+    verifiedBy: "Byron Benitez <byron.benitez@vero-biotech.com>",
     status: "Passed",
-    dateOfVerification: "12/19/2020 12:00 AM",
+    dateOfVerification: new Date(2020, 12, 19, 12, 0),
     details: "This validation item has passed, verified!",
   },
   {
-    verifiedBy: "Byron Benitez",
+    verifiedBy: "Byron Benitez <byron.benitez@vero-biotech.com>",
     status: "Passed",
-    dateOfVerification: "12/18/2020 12:00 AM",
+    dateOfVerification: new Date(2020, 12, 18, 12, 0),
     details: "This validation item has passed, verified!",
   },
   {
-    verifiedBy: "Byron Benitez",
+    verifiedBy: "Byron Benitez <byron.benitez@vero-biotech.com>",
     status: "Passed",
-    dateOfVerification: "12/17/2020 12:00 AM",
+    dateOfVerification: new Date(2020, 12, 17, 12, 0),
     details: "This validation item has passed, verified!",
-  },
+  },*/
 ];
