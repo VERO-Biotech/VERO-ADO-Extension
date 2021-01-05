@@ -18,6 +18,11 @@ export const getVerificationHistory = async (
     .replace(/(?<!=)&quot;/g, '"')
     .replace(/["]?%5c%22["]?/g, '\\"');
 
+
+  if (jsonData.length === 0) {
+    return;
+  }
+
   const itemsData: IVerificationInfo[] = JSON.parse(jsonData);
 
   itemsData.forEach((item) => {
