@@ -1,39 +1,83 @@
-import { getWorkItemService, fieldNames } from "./Common";
-import { IVerificationInfo } from "./Data";
+import { IObservableArray } from "azure-devops-ui/Core/Observable";
+import { IListSelection } from "azure-devops-ui/List";
+import { convertDateToUtc, fieldNames, getWorkItemService } from "./Common";
+import { IVerificationInfo } from "./VerificationInfo";
 
-export const isValidationField = (fieldName: string) =>
-  fieldName === fieldNames.status ||
-  fieldName === fieldNames.verifiedBy ||
-  fieldName === fieldNames.dateOfVerification;
-
-export const handleValidationFields = (fields: string[]) => {
-  fields.map((field) => {
-    console.log(field);
-  });
-};
-
-export const getValidationHistory = async () => {
+export const getVerificationHistory = async (
+  items: IObservableArray<IVerificationInfo>,
+  selection: IListSelection
+) => {
   const workItemFormService = await getWorkItemService();
-  const itemsRaw = await workItemFormService.getFieldValue(
+  const fieldValue = await workItemFormService.getFieldValue(
     fieldNames.validationHistory,
     { returnOriginalValue: false }
   );
-  const itemsData = JSON.parse(itemsRaw.toString());
 
-  return <IVerificationInfo[]>itemsData;
+  const jsonData = fieldValue
+    .toString()
+    .replace(/(?<!=)&quot;/g, '"')
+    .replace(/["]?%5c%22["]?/g, '\\"');
+
+  const itemsData: IVerificationInfo[] = JSON.parse(jsonData);
+
+  itemsData.forEach((item) => {
+    item.details = decodeURIComponent(item.details);
+    item.dateOfVerification = new Date(item.dateOfVerification);
+  });
+
+  items.value = itemsData;
+  selection.select(0);
 };
 
-const isVerificationUpdated = () => {};
+export const saveVerificationHistory = async (
+  items: IObservableArray<IVerificationInfo>,
+  selection: IListSelection
+) => {
+  const workItemFormService = await getWorkItemService();
+  const fieldValues = await workItemFormService.getFieldValues(
+    [
+      fieldNames.verifiedBy,
+      fieldNames.status,
+      fieldNames.dateOfVerification,
+      fieldNames.details,
+    ],
+    { returnOriginalValue: false }
+  );
 
-// We will not rely on the changed fields themselves, we will get a snapshot of the current status of the Verification fields to work with.
-// Only the single-line fields get sent in practice, so the Verification of change would need to be read.
-// On Save, we will check if any of the verification items are being modified, if so, then we will add a new record to the verification history,
-// capturing the snapshot of what we have.
+  const dateOfVerification = <Date>fieldValues[fieldNames.dateOfVerification];
+  const verifiedBy = <string>fieldValues[fieldNames.verifiedBy];
 
-// Events needed to map:
-// - onSave or isSave
-// - isVerificationUpdated
-// Then do two methods:
-// - addVerificationHistory: to read entries, and then add a new one at the top of the list, then update value and save, perhaps reload.
-// - readVerificationHistory: to parse saved items from custom field or storage and then populate view items. This can be done in the component
-// renderer automatically.
+  const newItem: IVerificationInfo = {
+    dateOfVerification: convertDateToUtc(dateOfVerification),
+    details: <string>fieldValues[fieldNames.details],
+    status: <string>fieldValues[fieldNames.status],
+    verifiedBy: verifiedBy.split("<")[0],
+  };
+
+  const firstItem = items.value[0] || null;
+
+  if (
+    firstItem !== null &&
+    (newItem.dateOfVerification.toISOString() !==
+      firstItem.dateOfVerification.toISOString() ||
+      newItem.details !== firstItem.details ||
+      newItem.status !== firstItem.status ||
+      newItem.verifiedBy !== firstItem.verifiedBy)
+  ) {
+
+    items.splice(0, 0, newItem);
+    selection.select(0);
+
+    await workItemFormService.setFieldValue(
+      fieldNames.validationHistory,
+      JSON.stringify(items.value)
+    );
+
+    const validationHist = await workItemFormService.getFieldValue(
+      fieldNames.validationHistory,
+      { returnOriginalValue: false }
+    );
+
+    await workItemFormService.save();
+  }
+};

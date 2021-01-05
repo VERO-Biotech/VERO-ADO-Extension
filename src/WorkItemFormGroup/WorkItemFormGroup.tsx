@@ -1,5 +1,8 @@
 import * as SDK from "azure-devops-extension-sdk";
-import { ObservableValue } from "azure-devops-ui/Core/Observable";
+import {
+  ObservableArray,
+  ObservableValue
+} from "azure-devops-ui/Core/Observable";
 import { ListSelection } from "azure-devops-ui/List";
 import { DetailsPanel, MasterPanel } from "azure-devops-ui/MasterDetails";
 import {
@@ -10,11 +13,11 @@ import {
 } from "azure-devops-ui/MasterDetailsContext";
 import * as React from "react";
 import { showRootComponent } from "../Common";
-import { IVerificationInfo, verificationHistory } from "./Data";
 import { registerEvents } from "./EventHandling";
 import { InitialDetailView } from "./InitialDetailView";
 import { InitialMasterPanelContent } from "./InitialMasterPanelContent";
 import "./MasterDetail.Example.css";
+import { emptyVerificationInfo, IVerificationInfo } from "./VerificationInfo";
 
 const initialPayload: IMasterDetailsContextLayer<
   IVerificationInfo,
@@ -25,16 +28,17 @@ const initialPayload: IMasterDetailsContextLayer<
     renderContent: (parentItem, initialSelectedMasterItem) => (
       <InitialMasterPanelContent
         initialSelectedMasterItem={initialSelectedMasterItem}
+        items={items}
+        selection={selection}
       />
     ),
-    //renderHeader: () => <MasterPanelHeader title={"Validation History"} />,
     hideBackButton: true,
   },
   detailsContent: {
     renderContent: (item) => <InitialDetailView detailItem={item} />,
   },
   selectedMasterItem: new ObservableValue<IVerificationInfo>(
-    verificationHistory[0]
+    emptyVerificationInfo[0]
   ),
   parentItem: undefined,
 };
@@ -46,27 +50,15 @@ const masterDetailsContext: IMasterDetailsContext = new BaseMasterDetailsContext
   }
 );
 
-export interface WorkItemFormGroupComponentState {
-  eventContent: string[];
-}
-class WorkItemFormGroupComponent extends React.Component<
-  {},
-  WorkItemFormGroupComponentState
-  > {
-  constructor(props: {}) {
-    super(props);
-    this.state = {
-      eventContent: [],
-    };
-  }
+const items = new ObservableArray(emptyVerificationInfo);
+const selection = new ListSelection({ selectOnFocus: false });
 
+class VerificationHistoryComponent extends React.Component<{}, {}> {
   public componentDidMount() {
     SDK.init().then(() => {
-      registerEvents(this);
+      registerEvents(this, items, selection);
     });
   }
-
-  private selection = new ListSelection(true);
 
   public render(): JSX.Element {
     return (
@@ -75,13 +67,9 @@ class WorkItemFormGroupComponent extends React.Component<
           <MasterPanel className="master-example-panel" />
           <DetailsPanel />
         </div>
-        {/*<SimpleList
-          itemProvider={new ArrayItemProvider<string>(this.state.eventContent)}
-          selection={this.selection}
-        />*/}
       </MasterDetailsContext.Provider>
     );
   }
 }
 
-showRootComponent(<WorkItemFormGroupComponent />);
+showRootComponent(<VerificationHistoryComponent />);

@@ -5,8 +5,8 @@ import { MasterDetailsContext } from "azure-devops-ui/MasterDetailsContext";
 import { Page } from "azure-devops-ui/Page";
 import { ScreenSizeObserver } from "azure-devops-ui/Utilities/ScreenSize";
 import * as React from "react";
-import { IVerificationInfo } from "./Data";
 import ReactHtmlParser from "react-html-parser";
+import { IVerificationInfo } from "./VerificationInfo";
 
 export const InitialDetailView: React.FunctionComponent<{
   detailItem: IVerificationInfo;
@@ -41,7 +41,7 @@ export const InitialDetailView: React.FunctionComponent<{
         }}
       </ScreenSizeObserver>
       <div className="page-content page-content-top">
-        <Card>{ReactHtmlParser(detailItem.details)}</Card>
+        <Card contentProps={{className: "card-body-description"}}>{ReactHtmlParser(detailItem.details)}</Card>
       </div>
     </Page>
   );

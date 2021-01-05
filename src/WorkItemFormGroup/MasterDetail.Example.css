@@ -4,7 +4,7 @@
 }
 
 .master-example-row-content {
-    padding: 8px 8px 8px 20px;
+    padding: 5px 5px 5px 20px;
 }
 
 .master-example-scroll-container {
@@ -44,4 +44,8 @@
 
 .context-details {
     flex-grow: 100;
+}
+
+.card-body-description {
+    display: block;
 }

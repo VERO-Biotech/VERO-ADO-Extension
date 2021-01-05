@@ -1,6 +1,6 @@
 import {
   IWorkItemFormService,
-  WorkItemTrackingServiceIds,
+  WorkItemTrackingServiceIds
 } from "azure-devops-extension-api/WorkItemTracking";
 import * as SDK from "azure-devops-extension-sdk";
 
