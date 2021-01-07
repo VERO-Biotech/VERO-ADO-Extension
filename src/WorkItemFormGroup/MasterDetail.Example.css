@@ -11,12 +11,12 @@
     max-height: 200px;
     width: 100%;
 }
-
+/*
 @media screen and (max-width: 1023px) {
     .single-layer-details {
         max-width: 150px;
     }
-}
+}*/
 
 .single-layer-details-contents {
     font-size: 18px;
@@ -27,12 +27,12 @@
 .bolt-master-panel-header-subtitle.secondary-text {
     color: inherit;
 }
-
+/*
 @media screen and (max-width: 800px) {
     .context-details {
         max-width: 320px;
     }
-}
+}*/
 
 .details-view-title {
     white-space: normal;

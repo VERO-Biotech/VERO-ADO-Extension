@@ -21,9 +21,11 @@
     "azure-devops-extension-api": "^1.158.0",
     "azure-devops-extension-sdk": "^2.0.11",
     "azure-devops-ui": "^2.167.0",
+    "moment": "^2.29.1",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
-    "react-html-parser": "^2.0.2"
+    "react-html-parser": "^2.0.2",
+    "react-moment": "^1.1.1"
   },
   "devDependencies": {
     "@types/react": "^17.0.0",

@@ -11,9 +11,11 @@ import {
 } from "azure-devops-ui/Status";
 import { Tooltip } from "azure-devops-ui/TooltipEx";
 import * as React from "react";
-import { verificationStatus } from "./Common";
+import Moment from 'react-moment';
+import { dateFormat, verificationStatus } from "./Common";
 import { getVerificationHistory } from "./VerificationHistory";
 import { IVerificationInfo } from "./VerificationInfo";
+
 
 const mapStatus = (status: string): IStatusProps => {
   switch (status) {
@@ -52,11 +54,11 @@ const renderInitialRow = (
         >
           <Tooltip overflowOnly={true}>
             <div className="primary-text text-ellipsis">
-              {item.status} - {item.dateOfVerification.toLocaleString()}
+              <strong>{item.status}:</strong> {item.build}
             </div>
           </Tooltip>
           <Tooltip overflowOnly={true}>
-            <div className="primary-text text-ellipsis">{item.verifiedBy}</div>
+            <div className="primary-text text-ellipsis">{item.verifiedBy} - <Moment date={item.dateOfVerification} format={dateFormat} /></div>
           </Tooltip>
         </div>
       </div>

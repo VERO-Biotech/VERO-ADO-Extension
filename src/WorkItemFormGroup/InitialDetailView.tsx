@@ -6,43 +6,41 @@ import { Page } from "azure-devops-ui/Page";
 import { ScreenSizeObserver } from "azure-devops-ui/Utilities/ScreenSize";
 import * as React from "react";
 import ReactHtmlParser from "react-html-parser";
+import Moment from "react-moment";
+import { dateFormat } from "./Common";
 import { IVerificationInfo } from "./VerificationInfo";
 
 export const InitialDetailView: React.FunctionComponent<{
   detailItem: IVerificationInfo;
 }> = (props) => {
-  const masterDetailsContext = React.useContext(MasterDetailsContext);
   const { detailItem } = props;
 
-  return (
-    <Page className="context-details">
-      <ScreenSizeObserver>
-        {(screenSizeProps: { screenSize: ScreenSize }) => {
-          const showBackButton = screenSizeProps.screenSize <= ScreenSize.small;
-          return (
-            <Header
-              description={`Verified by ${
-                detailItem.verifiedBy
-              } on ${detailItem.dateOfVerification.toLocaleString()}`}
-              descriptionClassName="description-primary-text margin-bottom-8"
-              title={detailItem.status}
-              titleClassName="details-view-title margin-bottom-8"
-              titleSize={TitleSize.Large}
-              backButtonProps={
-                showBackButton
-                  ? {
-                      onClick: () =>
-                        masterDetailsContext.setDetailsPanelVisbility(false),
-                    }
-                  : undefined
-              }
-            />
-          );
-        }}
-      </ScreenSizeObserver>
-      <div className="page-content page-content-top">
-        <Card contentProps={{className: "card-body-description"}}>{ReactHtmlParser(detailItem.details)}</Card>
-      </div>
-    </Page>
-  );
+  if (detailItem === undefined) {
+    return <div></div>;
+  } else {
+    return (
+      <Page className="context-details">
+        <Header
+          description={
+            <div>
+              Verified by {detailItem.verifiedBy} on{" "}
+              <Moment
+                date={detailItem.dateOfVerification}
+                format={dateFormat}
+              />
+            </div>
+          }
+          descriptionClassName="description-primary-text margin-bottom-8"
+          title={`${detailItem.status}: ${detailItem.build || ""}`}
+          titleClassName="details-view-title margin-bottom-8"
+          titleSize={TitleSize.Large}
+        />
+        <div className="page-content page-content-top">
+          <Card contentProps={{ className: "card-body-description" }}>
+            {ReactHtmlParser(detailItem.details)}
+          </Card>
+        </div>
+      </Page>
+    );
+  }
 };

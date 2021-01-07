@@ -38,7 +38,7 @@ const initialPayload: IMasterDetailsContextLayer<
     renderContent: (item) => <InitialDetailView detailItem={item} />,
   },
   selectedMasterItem: new ObservableValue<IVerificationInfo>(
-    emptyVerificationInfo[0]
+    emptyVerificationInfo[0] // This is actually undefined
   ),
   parentItem: undefined,
 };
@@ -64,7 +64,7 @@ class VerificationHistoryComponent extends React.Component<{}, {}> {
     return (
       <MasterDetailsContext.Provider value={masterDetailsContext}>
         <div className="flex-row" style={{ display: "flex", width: "100%" }}>
-          <MasterPanel className="master-example-panel" />
+          <MasterPanel className="master-example-panel show-on-small-screens" />
           <DetailsPanel />
         </div>
       </MasterDetailsContext.Provider>

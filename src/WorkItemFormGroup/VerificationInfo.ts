@@ -3,13 +3,15 @@ export interface IVerificationInfo {
   status: string;
   dateOfVerification: Date;
   details: string;
+  build: string;
 }
 
 export const emptyVerificationInfo: IVerificationInfo[] = [
-  {
+  /*{
     verifiedBy: "",
     status: "",
     dateOfVerification: new Date(),
     details: "",
-  },
+    build: "",
+  },*/
 ];

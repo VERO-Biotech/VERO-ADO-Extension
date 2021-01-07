@@ -1,6 +1,6 @@
 import {
   IWorkItemFormService,
-  WorkItemTrackingServiceIds
+  WorkItemTrackingServiceIds,
 } from "azure-devops-extension-api/WorkItemTracking";
 import * as SDK from "azure-devops-extension-sdk";
 
@@ -19,6 +19,7 @@ export interface IFieldNames {
   parent: string;
   revision: string;
   workItemType: string;
+  integrationBuild: string;
 }
 
 export const fieldNames: IFieldNames = {
@@ -30,6 +31,7 @@ export const fieldNames: IFieldNames = {
   parent: "System.Parent",
   revision: "System.Rev",
   workItemType: "System.WorkItemType",
+  integrationBuild: "Microsoft.VSTS.Build.IntegrationBuild",
 };
 
 export interface IWorkItemTypes {
@@ -61,3 +63,5 @@ export const convertDateToUtc = (dateOfVerification: Date) => {
     dateOfVerification.getUTCMilliseconds()
   );
 };
+
+export const dateFormat: string = "MMM DD YYYY, h:mm:ss A";
