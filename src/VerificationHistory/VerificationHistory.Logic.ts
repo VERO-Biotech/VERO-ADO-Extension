@@ -28,6 +28,7 @@ const decodeItems = (data: string) => {
     JSON.parse(inflate(dataToBeInflated, { to: "string" })) || [];
 
   items.forEach((item) => {
+    item.dateAdded = new Date(item.dateAdded);
     item.dateOfVerification = new Date(item.dateOfVerification);
   });
 
@@ -67,6 +68,7 @@ export const saveVerificationHistory = async (
     status: <string>fieldValues[fieldNames.status],
     verifiedBy: verifiedBy.split("<")[0],
     build: <string>fieldValues[fieldNames.integrationBuild],
+    dateAdded: convertDateToUtc(new Date()),
   };
 
   if (
