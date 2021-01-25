@@ -10,11 +10,15 @@ import {
 } from "../FormCustomEvents/TaskParentValidation";
 
 const registerEvents = () => {
+  const isTaskParentValidationOn = SDK.getConfiguration().witInputs
+    .EnableTaskOrphanCheck;
+
   SDK.register(SDK.getContributionId(), () => {
     return {
       // Called when the active work item is modified
       onFieldChanged: (args: IWorkItemFieldChangedArgs) => {
         if (
+          isTaskParentValidationOn &&
           args.changedFields[fieldNames.parent] &&
           args.changedFields[fieldNames.parent] !== null
         ) {
@@ -28,10 +32,12 @@ const registerEvents = () => {
 
       // Called when a new work item is being loaded in the UI
       onLoaded: (args: IWorkItemLoadedArgs) => {
-        try {
-          checkTaskForMissingParent();
-        } catch (err) {
-          console.error("Error checking for Task missing parent: ", err);
+        if (isTaskParentValidationOn) {
+          try {
+            checkTaskForMissingParent();
+          } catch (err) {
+            console.error("Error checking for Task missing parent: ", err);
+          }
         }
       },
     };
