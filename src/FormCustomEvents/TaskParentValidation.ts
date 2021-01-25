@@ -1,6 +1,6 @@
-import { fieldNames, getWorkItemService, workItemTypes } from "./Common";
+import { fieldNames, getWorkItemService, workItemTypes } from "../Common";
 
-export const checkParentIfTask = async () => {
+export const checkTaskForMissingParent = async () => {
   // Set an error if we have a Task and the System.Parent value is null
   const workItemFormService = await getWorkItemService();
   const values = await getParentAndItemTypeValues();

@@ -3,6 +3,7 @@ import {
   WorkItemTrackingServiceIds,
 } from "azure-devops-extension-api/WorkItemTracking";
 import * as SDK from "azure-devops-extension-sdk";
+import { IStatusProps, Statuses } from "azure-devops-ui/Status";
 
 export const getWorkItemService = async () => {
   return await SDK.getService<IWorkItemFormService>(
@@ -62,6 +63,17 @@ export const convertDateToUtc = (dateOfVerification: Date) => {
     dateOfVerification.getUTCSeconds(),
     dateOfVerification.getUTCMilliseconds()
   );
+};
+
+export const mapStatus = (status: string): IStatusProps => {
+  switch (status) {
+    case verificationStatus.passed:
+      return Statuses.Success;
+    case verificationStatus.failed:
+      return Statuses.Failed;
+  }
+  // Return blank status if no mapping found
+  return Statuses.Queued;
 };
 
 export const dateFormat: string = "MMM DD YYYY, h:mm:ss A";

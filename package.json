@@ -1,7 +1,7 @@
 {
-  "name": "hot-reload-and-debug",
-  "description": "Use hot reload and debug directly in VS Code",
-  "author": "Microsoft",
+  "name": "vero-biotech-ado-extension",
+  "description": "VERO Biotech - ADO Extension",
+  "author": "VERO Biotech",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -22,12 +22,14 @@
     "azure-devops-extension-sdk": "^2.0.11",
     "azure-devops-ui": "^2.167.0",
     "moment": "^2.29.1",
+    "pako": "^2.0.3",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-html-parser": "^2.0.2",
     "react-moment": "^1.1.1"
   },
   "devDependencies": {
+    "@types/pako": "^1.0.1",
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
     "@types/react-html-parser": "^2.0.1",

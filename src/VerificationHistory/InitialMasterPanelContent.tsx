@@ -4,29 +4,15 @@ import {
   bindSelectionToObservable, MasterDetailsContext
 } from "azure-devops-ui/MasterDetailsContext";
 import {
-  IStatusProps,
   Status,
-  Statuses,
   StatusSize
 } from "azure-devops-ui/Status";
 import { Tooltip } from "azure-devops-ui/TooltipEx";
 import * as React from "react";
 import Moment from 'react-moment';
-import { dateFormat, verificationStatus } from "./Common";
-import { getVerificationHistory } from "./VerificationHistory";
+import { dateFormat, mapStatus } from "../Common";
+import { getVerificationHistory } from "./VerificationHistory.Logic";
 import { IVerificationInfo } from "./VerificationInfo";
-
-
-const mapStatus = (status: string): IStatusProps => {
-  switch (status) {
-    case verificationStatus.passed:
-      return Statuses.Success;
-    case verificationStatus.failed:
-      return Statuses.Failed;
-  }
-  // Return blank status if no mapping found
-  return Statuses.Queued;
-};
 
 const renderInitialRow = (
   index: number,
@@ -54,7 +40,7 @@ const renderInitialRow = (
         >
           <Tooltip overflowOnly={true}>
             <div className="primary-text text-ellipsis">
-              <strong>{item.status}:</strong> {item.build}
+              <strong>{item.status}:</strong> {item.build || "Build or version N/A"}
             </div>
           </Tooltip>
           <Tooltip overflowOnly={true}>
@@ -90,7 +76,7 @@ export const InitialMasterPanelContent: React.FunctionComponent<InitialMasterPan
 
   return (
     <List
-      ariaLabel={"Validation history entries"}
+      ariaLabel={"Verification History entries"}
       itemProvider={initialItemProvider}
       selection={selection}
       renderRow={renderInitialRow}

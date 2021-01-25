@@ -1,7 +1,8 @@
 import { IObservableArray } from "azure-devops-ui/Core/Observable";
 import { IListSelection } from "azure-devops-ui/List";
-import { convertDateToUtc, fieldNames, getWorkItemService } from "./Common";
-import { emptyVerificationInfo, IVerificationInfo } from "./VerificationInfo";
+import { convertDateToUtc, fieldNames, getWorkItemService } from "../Common";
+import { IVerificationInfo } from "./VerificationInfo";
+import { deflate, inflate } from "pako";
 
 export const getVerificationHistory = async (
   items: IObservableArray<IVerificationInfo>,
@@ -13,26 +14,28 @@ export const getVerificationHistory = async (
     { returnOriginalValue: false }
   );
 
-  const jsonData = fieldValue
-    .toString()
-    .replace(/(?<!=)&quot;/g, '"')
-    .replace(/["]?%5c%22["]?/g, '\\"');
+  items.value = decodeItems(fieldValue.toString());
+  selection.select(0);
+};
 
-  console.log("Json Data", jsonData);
-
-  if (jsonData.length === 0) {
-    return;
+const decodeItems = (data: string) => {
+  if (data.length === 0) {
+    return <IVerificationInfo[]>[];
   }
 
-  const itemsData: IVerificationInfo[] = JSON.parse(jsonData);
+  const dataToBeInflated = data.split(",").map(Number);
+  const items: IVerificationInfo[] =
+    JSON.parse(inflate(dataToBeInflated, { to: "string" })) || [];
 
-  itemsData.forEach((item) => {
-    item.details = decodeURIComponent(item.details);
+  items.forEach((item) => {
     item.dateOfVerification = new Date(item.dateOfVerification);
   });
 
-  items.value = itemsData;
-  selection.select(0);
+  return items;
+};
+
+const encodeItems = (data: IVerificationInfo[]) => {
+  return deflate(JSON.stringify(data), { to: "string" }).toString();
 };
 
 export const saveVerificationHistory = async (
@@ -66,8 +69,6 @@ export const saveVerificationHistory = async (
     build: <string>fieldValues[fieldNames.integrationBuild],
   };
 
-  console.log("New item", newItem);
-
   if (
     isVerificationValid(newItem) &&
     areVerificationsNotEqual(newItem, items.value[0])
@@ -75,11 +76,9 @@ export const saveVerificationHistory = async (
     items.splice(0, 0, newItem);
     selection.select(0);
 
-    console.log("Items Data", items.value);
-
     await workItemFormService.setFieldValue(
       fieldNames.validationHistory,
-      JSON.stringify(items.value)
+      encodeItems(items.value)
     );
 
     await workItemFormService.save();

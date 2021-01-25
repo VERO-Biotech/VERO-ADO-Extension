@@ -1,8 +1,8 @@
 {
   "manifestVersion": 1,
-  "version": "1.0.11",
-  "name": "Hot Reload and Debug",
-  "description": "Use hot reload and debug directly in VS Code",
+  "version": "1.0.15",
+  "name": "VERO Biotech ADO Extension",
+  "description": "ADO Extension with custom functionality for VERO Biotech.",
   "publisher": "VeroBiotech",
   "demands": ["api-version/3.0"],
   "categories": ["Azure Repos"],
@@ -15,7 +15,7 @@
     }
   },
   "icons": {
-    "default": "img/world.png"
+    "default": "img/vero-biotech.jpg"
   },
   "files": [{
       "path": "dist",
@@ -27,56 +27,47 @@
     }
   ],
   "contributions": [{
-      "id": "hello-world-hub-group",
-      "type": "ms.vss-web.hub-group",
-      "description": "Sample hub group",
-      "targets": ["ms.vss-web.project-hub-groups-collection"],
-      "properties": {
-        "name": "Hello World!",
-        "icon": {
-          "dark": "img/world.png",
-          "light": "img/world.png"
-        }
-      }
-    },
-    {
-      "id": "hub",
-      "type": "ms.vss-web.hub",
-      "targets": [".hello-world-hub-group"],
-      "includes": [
-        "ms.vss-tfs-web.tfs-page-data-service",
-        "ms.vss-features.host-navigation-service",
-        "ms.vss-features.extension-data-service",
-        "ms.vss-features.host-dialog-service"
-      ],
-      "properties": {
-        "name": "Sample hub",
-        "uri": "dist/Hub/Hub.html",
-        "icon": "asset://static/sample-icon.png",
-        "supportsMobile": true
-      }
-    },
-    {
-      "id": "work-item-verification-form-group",
+      "id": "verification-history-control",
       "type": "ms.vss-work-web.work-item-form-control",
       "targets": ["ms.vss-work-web.work-item-form"],
       "properties": {
-        "name": "Verification Group",
-        "uri": "dist/WorkItemFormGroup/WorkItemFormGroup.html",
+        "name": "Verification History Field",
+        "uri": "dist/VerificationHistory/VerificationHistory.html",
         "height": 600,
         "inputs": [{
-            "id": "FieldName",
-            "label": "Select the field for this control. This is the only input needed if the field is a picklist field with suggested values.",
-            "type": "WorkItemField",
-            "properties": {
-              "workItemFieldTypes": ["String", "PlainText", "HTML"]
-            },
-            "validation": {
-              "dataType": "String",
-              "isRequired": true
-            }
+          "id": "FieldName",
+          "name": "Field mapped for Verification History",
+          "description": "Select the field that will be mapped for the Verification History. This must be a multi-line field.",
+          "type": "WorkItemField",
+          "properties": {
+            "workItemFieldTypes": ["HTML"]
+          },
+          "validation": {
+            "dataType": "String",
+            "isRequired": true
           }
-        ]
+        }]
+      }
+    },
+    {
+      "id": "form-custom-events",
+      "type": "ms.vss-work-web.work-item-notifications",
+      "description": "Handles custom events on Work Item Form",
+      "targets": [
+        "ms.vss-work-web.work-item-form"
+      ],
+      "properties": {
+        "uri": "dist/FormCustomEvents/FormCustomEvents.html",
+        "inputs": [{
+          "id": "EnableTaskOrphanCheck",
+          "name": "Tasks always require a parent",
+          "description": "Enable validation for orphaned Tasks Work Item type. Task will always require a parent.",
+          "inputMode": "CheckBox",
+          "validation": {
+            "dataType": "Boolean",
+            "isRequired": false
+          }
+        }]
       }
     }
   ]

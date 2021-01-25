@@ -5,5 +5,5 @@ import * as ReactDOM from "react-dom";
 import "./Common.scss";
 
 export function showRootComponent(component: React.ReactElement<any>) {
-    ReactDOM.render(component, document.getElementById("root"));
+  ReactDOM.render(component, document.getElementById("root"));
 }
