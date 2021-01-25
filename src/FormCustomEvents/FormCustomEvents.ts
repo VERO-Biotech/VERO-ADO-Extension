@@ -17,31 +17,41 @@ const registerEvents = () => {
     return {
       // Called when the active work item is modified
       onFieldChanged: (args: IWorkItemFieldChangedArgs) => {
-        if (
-          isTaskParentValidationOn &&
-          args.changedFields[fieldNames.parent] &&
-          args.changedFields[fieldNames.parent] !== null
-        ) {
-          try {
-            clearTaskMissingParentError();
-          } catch (err) {
-            console.error("Error clearing missing parent messages: ", err);
-          }
+        if (isTaskParentValidationOn) {
+          taskParentValidationClearErrors(args);
+          // Need to also validate on field change for Parent removal scenario
+          taskParentValidation();
         }
       },
-
       // Called when a new work item is being loaded in the UI
       onLoaded: (args: IWorkItemLoadedArgs) => {
         if (isTaskParentValidationOn) {
-          try {
-            checkTaskForMissingParent();
-          } catch (err) {
-            console.error("Error checking for Task missing parent: ", err);
-          }
+          taskParentValidation();
         }
       },
     };
   });
+};
+
+const taskParentValidation = () => {
+  try {
+    checkTaskForMissingParent();
+  } catch (err) {
+    console.error("Error checking for Task missing parent: ", err);
+  }
+};
+
+const taskParentValidationClearErrors = (args: IWorkItemFieldChangedArgs) => {
+  if (
+    args.changedFields[fieldNames.parent] &&
+    args.changedFields[fieldNames.parent] !== null
+  ) {
+    try {
+      clearTaskMissingParentError();
+    } catch (err) {
+      console.error("Error clearing missing parent messages: ", err);
+    }
+  }
 };
 
 SDK.init().then(() => {
