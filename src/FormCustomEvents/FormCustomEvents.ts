@@ -7,7 +7,7 @@ import { fieldNames } from "../Common";
 import {
   checkTaskForMissingParent,
   clearTaskMissingParentError,
-} from "../FormCustomEvents/TaskParentValidation";
+} from "./TaskParentValidation";
 
 const registerEvents = () => {
   const isTaskParentValidationOn = SDK.getConfiguration().witInputs

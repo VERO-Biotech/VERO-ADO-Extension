@@ -13,7 +13,6 @@ import {
 } from "azure-devops-ui/MasterDetailsContext";
 import * as React from "react";
 import { showRootComponent } from "../CommonReact";
-
 import { InitialDetailView } from "./InitialDetailView";
 import { InitialMasterPanelContent } from "./InitialMasterPanelContent";
 import "./VerificationHistory.css";
