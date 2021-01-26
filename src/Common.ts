@@ -12,7 +12,7 @@ export const getWorkItemService = async () => {
 };
 
 export interface IFieldNames {
-  validationHistory: string;
+  verificationHistory: string;
   verifiedBy: string;
   status: string;
   dateOfVerification: string;
@@ -24,11 +24,11 @@ export interface IFieldNames {
 }
 
 export const fieldNames: IFieldNames = {
-  validationHistory: "Custom.VerificationHistoryLong",
-  verifiedBy: "Custom.Verifiedby",
-  status: "Custom.Verificationstatus",
-  dateOfVerification: "Custom.Dateofverification",
-  details: "Custom.Verificationofchange",
+  verificationHistory: "",
+  verifiedBy: "",
+  status: "",
+  dateOfVerification: "",
+  details: "",
   parent: "System.Parent",
   revision: "System.Rev",
   workItemType: "System.WorkItemType",

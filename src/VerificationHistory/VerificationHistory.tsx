@@ -1,7 +1,7 @@
 import * as SDK from "azure-devops-extension-sdk";
 import {
   ObservableArray,
-  ObservableValue
+  ObservableValue,
 } from "azure-devops-ui/Core/Observable";
 import { ListSelection } from "azure-devops-ui/List";
 import { DetailsPanel, MasterPanel } from "azure-devops-ui/MasterDetails";
@@ -9,7 +9,7 @@ import {
   BaseMasterDetailsContext,
   IMasterDetailsContext,
   IMasterDetailsContextLayer,
-  MasterDetailsContext
+  MasterDetailsContext,
 } from "azure-devops-ui/MasterDetailsContext";
 import * as React from "react";
 import { showRootComponent } from "../CommonReact";
@@ -19,7 +19,10 @@ import "./VerificationHistory.css";
 import { emptyVerificationInfo, IVerificationInfo } from "./VerificationInfo";
 import { IObservableArray } from "azure-devops-ui/Core/Observable";
 import { IListSelection } from "azure-devops-ui/List";
-import { IWorkItemFieldChangedArgs, IWorkItemLoadedArgs } from "azure-devops-extension-api/WorkItemTracking";
+import {
+  IWorkItemFieldChangedArgs,
+  IWorkItemLoadedArgs,
+} from "azure-devops-extension-api/WorkItemTracking";
 import { saveVerificationHistory } from "./VerificationHistory.Logic";
 import { fieldNames } from "../Common";
 
@@ -75,12 +78,23 @@ const registerEvents = (
   });
 };
 
+const readConfigValues = () => {
+  const configVars = SDK.getConfiguration().witInputs;
+
+  fieldNames.verificationHistory = configVars.VerificationHistory;
+  fieldNames.verifiedBy = configVars.VerifiedBy;
+  fieldNames.status = configVars.VerificationStatus;
+  fieldNames.dateOfVerification = configVars.DateOfVerification;
+  fieldNames.details = configVars.VerificationOfChange;
+};
+
 const items = new ObservableArray(emptyVerificationInfo);
 const selection = new ListSelection({ selectOnFocus: false });
 
 class VerificationHistoryComponent extends React.Component<{}, {}> {
   public componentDidMount() {
     SDK.init().then(() => {
+      readConfigValues();
       registerEvents(items, selection);
     });
   }

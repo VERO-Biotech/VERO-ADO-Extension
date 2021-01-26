@@ -1,6 +1,6 @@
 {
   "manifestVersion": 1,
-  "version": "1.0.20",
+  "version": "1.0.25",
   "name": "VERO Biotech ADO Extension",
   "description": "ADO Extension with custom functionality for VERO Biotech.",
   "publisher": "VeroBiotech",
@@ -37,18 +37,68 @@
         "height": 600,
         "icon": "asset://img/vero-biotech.jpg",
         "inputs": [{
-          "id": "FieldName",
-          "name": "Field mapped for Verification History",
-          "description": "Select the field that will be mapped for the Verification History. This must be a multi-line field.",
-          "type": "WorkItemField",
-          "properties": {
-            "workItemFieldTypes": ["HTML"]
+            "id": "VerificationHistory",
+            "name": "Field for Verification History",
+            "description": "Select the field that will be mapped to store the full Verification History (compressed). This must be a multi-line field.",
+            "type": "WorkItemField",
+            "properties": {
+              "workItemFieldTypes": ["HTML"]
+            },
+            "validation": {
+              "dataType": "String",
+              "isRequired": true
+            }
           },
-          "validation": {
-            "dataType": "String",
-            "isRequired": true
+          {
+            "id": "VerifiedBy",
+            "name": "Field for Verified by",
+            "description": "Select the field that will be mapped for Verified by. This must be an identity (user) field.",
+            "type": "WorkItemField",
+            "validation": {
+              "dataType": "String",
+              "isRequired": true
+            }
+          },
+          {
+            "id": "VerificationStatus",
+            "name": "Field for Verification status",
+            "description": "Select the field that will be mapped for Verification status. This must be a text field (ideally drop-down).",
+            "type": "WorkItemField",
+            "properties": {
+              "workItemFieldTypes": ["String"]
+            },
+            "validation": {
+              "dataType": "String",
+              "isRequired": true
+            }
+          },
+          {
+            "id": "DateOfVerification",
+            "name": "Field for Date of verification",
+            "description": "Select the field that will be mapped for the Date of Verification. This must be a Date/Time field.",
+            "type": "WorkItemField",
+            "properties": {
+              "workItemFieldTypes": ["DateTime"]
+            },
+            "validation": {
+              "dataType": "String",
+              "isRequired": true
+            }
+          },
+          {
+            "id": "VerificationOfChange",
+            "name": "Field for Verification of change",
+            "description": "Select the field that will be mapped for Verification of change. This must be a multi-line field.",
+            "type": "WorkItemField",
+            "properties": {
+              "workItemFieldTypes": ["HTML"]
+            },
+            "validation": {
+              "dataType": "String",
+              "isRequired": true
+            }
           }
-        }]
+        ]
       }
     },
     {

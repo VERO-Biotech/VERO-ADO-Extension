@@ -1,8 +1,9 @@
+import * as SDK from "azure-devops-extension-sdk";
 import { IObservableArray } from "azure-devops-ui/Core/Observable";
 import { IListSelection } from "azure-devops-ui/List";
+import { deflate, inflate } from "pako";
 import { convertDateToUtc, fieldNames, getWorkItemService } from "../Common";
 import { IVerificationInfo } from "./VerificationInfo";
-import { deflate, inflate } from "pako";
 
 export const getVerificationHistory = async (
   items: IObservableArray<IVerificationInfo>,
@@ -10,7 +11,7 @@ export const getVerificationHistory = async (
 ) => {
   const workItemFormService = await getWorkItemService();
   const fieldValue = await workItemFormService.getFieldValue(
-    fieldNames.validationHistory,
+    fieldNames.verificationHistory,
     { returnOriginalValue: false }
   );
 
@@ -79,7 +80,7 @@ export const saveVerificationHistory = async (
     selection.select(0);
 
     await workItemFormService.setFieldValue(
-      fieldNames.validationHistory,
+      fieldNames.verificationHistory,
       encodeItems(items.value)
     );
 
