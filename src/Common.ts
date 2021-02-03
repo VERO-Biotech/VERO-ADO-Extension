@@ -21,6 +21,7 @@ export interface IFieldNames {
   revision: string;
   workItemType: string;
   integrationBuild: string;
+  areaPath: string;
 }
 
 export const fieldNames: IFieldNames = {
@@ -33,6 +34,7 @@ export const fieldNames: IFieldNames = {
   revision: "System.Rev",
   workItemType: "System.WorkItemType",
   integrationBuild: "Microsoft.VSTS.Build.IntegrationBuild",
+  areaPath: "System.AreaPath",
 };
 
 export interface IWorkItemTypes {

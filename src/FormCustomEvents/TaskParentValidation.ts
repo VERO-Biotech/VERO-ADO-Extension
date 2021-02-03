@@ -1,6 +1,30 @@
+import { IWorkItemFieldChangedArgs } from "azure-devops-extension-api/WorkItemTracking";
 import { fieldNames, getWorkItemService, workItemTypes } from "../Common";
 
-export const checkTaskForMissingParent = async () => {
+export const taskParentValidation = () => {
+  try {
+    checkTaskForMissingParent();
+  } catch (err) {
+    console.error("Error checking for Task missing parent: ", err);
+  }
+};
+
+export const taskParentValidationClearErrors = (
+  args: IWorkItemFieldChangedArgs
+) => {
+  try {
+    if (
+      args.changedFields[fieldNames.parent] &&
+      args.changedFields[fieldNames.parent] !== null
+    ) {
+      clearTaskMissingParentError();
+    }
+  } catch (err) {
+    console.error("Error clearing missing parent messages: ", err);
+  }
+};
+
+const checkTaskForMissingParent = async () => {
   // Set an error if we have a Task and the System.Parent value is null
   const workItemFormService = await getWorkItemService();
   const values = await getParentAndItemTypeValues();
@@ -15,7 +39,7 @@ export const checkTaskForMissingParent = async () => {
   }
 };
 
-export const clearTaskMissingParentError = async () => {
+const clearTaskMissingParentError = async () => {
   // Clear the error that we set if the parent is set
   const workItemFormService = await getWorkItemService();
   const values = await getParentAndItemTypeValues();

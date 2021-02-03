@@ -1,6 +1,6 @@
 {
   "manifestVersion": 1,
-  "version": "1.0.25",
+  "version": "1.0.26",
   "name": "VERO Biotech ADO Extension",
   "description": "ADO Extension with custom functionality for VERO Biotech.",
   "publisher": "VeroBiotech",
@@ -116,6 +116,16 @@
           "id": "EnableTaskOrphanCheck",
           "name": "Tasks always require a parent",
           "description": "Enable validation for orphaned Tasks Work Item type. Task will always require a parent.",
+          "inputMode": "CheckBox",
+          "validation": {
+            "dataType": "Boolean",
+            "isRequired": false
+          }
+        },
+        {
+          "id": "RequireAreaSelection",
+          "name": "Require users to select Area",
+          "description": "Require users to manually select the correct area when creating a new Work Item.",
           "inputMode": "CheckBox",
           "validation": {
             "dataType": "Boolean",

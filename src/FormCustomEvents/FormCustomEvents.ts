@@ -3,21 +3,21 @@ import {
   IWorkItemLoadedArgs,
 } from "azure-devops-extension-api/WorkItemTracking";
 import * as SDK from "azure-devops-extension-sdk";
-import { fieldNames } from "../Common";
+import { requireAreaSelection } from "./RequireAreaSelection";
 import {
-  checkTaskForMissingParent,
-  clearTaskMissingParentError,
+  taskParentValidation,
+  taskParentValidationClearErrors,
 } from "./TaskParentValidation";
+import { getCustomEventSettings } from "./CustomEventSettings";
 
 const registerEvents = () => {
-  const isTaskParentValidationOn = SDK.getConfiguration().witInputs
-    .EnableTaskOrphanCheck;
+  const settings = getCustomEventSettings();
 
   SDK.register(SDK.getContributionId(), () => {
     return {
       // Called when the active work item is modified
       onFieldChanged: (args: IWorkItemFieldChangedArgs) => {
-        if (isTaskParentValidationOn) {
+        if (settings.taskParentValidationOn) {
           taskParentValidationClearErrors(args);
           // Need to also validate on field change for Parent removal scenario
           taskParentValidation();
@@ -25,35 +25,22 @@ const registerEvents = () => {
       },
       // Called when a new work item is being loaded in the UI
       onLoaded: (args: IWorkItemLoadedArgs) => {
-        if (isTaskParentValidationOn) {
+        if (settings.taskParentValidationOn) {
           taskParentValidation();
+        }
+
+        if (settings.requireAreaSelectionOn) {
+          requireAreaSelection(args);
         }
       },
     };
   });
 };
 
-const taskParentValidation = () => {
-  try {
-    checkTaskForMissingParent();
-  } catch (err) {
-    console.error("Error checking for Task missing parent: ", err);
-  }
-};
-
-const taskParentValidationClearErrors = (args: IWorkItemFieldChangedArgs) => {
-  if (
-    args.changedFields[fieldNames.parent] &&
-    args.changedFields[fieldNames.parent] !== null
-  ) {
-    try {
-      clearTaskMissingParentError();
-    } catch (err) {
-      console.error("Error clearing missing parent messages: ", err);
-    }
-  }
-};
-
-SDK.init().then(() => {
-  registerEvents();
-});
+try {
+  SDK.init().then(() => {
+    registerEvents();
+  });
+} catch (err) {
+  console.error("Error initializing FormCustomEvents", err);
+}
