@@ -2,7 +2,7 @@ import * as SDK from "azure-devops-extension-sdk";
 import { IObservableArray } from "azure-devops-ui/Core/Observable";
 import { IListSelection } from "azure-devops-ui/List";
 import { deflate, inflate } from "pako";
-import { convertDateToUtc, fieldNames, getWorkItemService } from "../Common";
+import { fieldNames, getWorkItemService } from "../Common";
 import { IVerificationInfo } from "./VerificationInfo";
 
 export const getVerificationHistory = async (
@@ -64,12 +64,12 @@ export const saveVerificationHistory = async (
   }
 
   const newItem: IVerificationInfo = {
-    dateOfVerification: convertDateToUtc(dateOfVerification),
+    dateOfVerification: dateOfVerification,
     details: <string>fieldValues[fieldNames.details],
     status: <string>fieldValues[fieldNames.status],
     verifiedBy: verifiedBy.split("<")[0],
     build: <string>fieldValues[fieldNames.integrationBuild],
-    dateAdded: convertDateToUtc(new Date()),
+    dateAdded: new Date(),
   };
 
   if (

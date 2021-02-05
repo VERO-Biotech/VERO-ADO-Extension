@@ -55,18 +55,6 @@ export const verificationStatus: IVerificationStatus = {
   failed: "Failed",
 };
 
-export const convertDateToUtc = (dateOfVerification: Date) => {
-  return new Date(
-    dateOfVerification.getUTCFullYear(),
-    dateOfVerification.getUTCMonth(),
-    dateOfVerification.getUTCDate(),
-    dateOfVerification.getUTCHours(),
-    dateOfVerification.getUTCMinutes(),
-    dateOfVerification.getUTCSeconds(),
-    dateOfVerification.getUTCMilliseconds()
-  );
-};
-
 export const mapStatus = (status: string): IStatusProps => {
   switch (status) {
     case verificationStatus.passed:
