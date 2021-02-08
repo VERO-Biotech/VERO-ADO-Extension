@@ -23,7 +23,7 @@ export const getVerificationHistory = async (
   selection: IListSelection
 ) => {
   try {
-    getWorkItemUpdates(items, selection);
+    await getWorkItemUpdates(items, selection);
   } catch (err) {
     console.error("Error reading updates for Verification History.", err);
   }
@@ -84,6 +84,8 @@ const getWorkItemUpdates = async (
     .sort((a, b) => -compareDates(a.dateOfVerification, b.dateOfVerification));
 
   selection.select(0);
+
+  await SDK.notifyLoadSucceeded();
 };
 
 const swapWithLastGoodValue = (

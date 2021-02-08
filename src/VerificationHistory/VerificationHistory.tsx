@@ -1,9 +1,8 @@
-import {
-  IWorkItemFieldChangedArgs
-} from "azure-devops-extension-api/WorkItemTracking";
+import { IWorkItemFieldChangedArgs } from "azure-devops-extension-api/WorkItemTracking";
 import * as SDK from "azure-devops-extension-sdk";
 import {
-  IObservableArray, ObservableArray,
+  IObservableArray,
+  ObservableArray,
   ObservableValue
 } from "azure-devops-ui/Core/Observable";
 import { IListSelection, ListSelection } from "azure-devops-ui/List";
@@ -85,8 +84,10 @@ const items = new ObservableArray(emptyVerificationInfo);
 const selection = new ListSelection({ selectOnFocus: false });
 
 class VerificationHistoryComponent extends React.Component<{}, {}> {
-  public componentDidMount() {
-    SDK.init().then(() => {
+  constructor(prop: {} | Readonly<{}>) {
+    super(prop);
+    
+    SDK.init({ loaded: false }).then(() => {
       readConfigValues();
       registerEvents(items, selection);
     });
