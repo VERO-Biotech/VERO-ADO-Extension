@@ -1,30 +1,27 @@
+import {
+  IWorkItemFieldChangedArgs
+} from "azure-devops-extension-api/WorkItemTracking";
 import * as SDK from "azure-devops-extension-sdk";
 import {
-  ObservableArray,
-  ObservableValue,
+  IObservableArray, ObservableArray,
+  ObservableValue
 } from "azure-devops-ui/Core/Observable";
-import { ListSelection } from "azure-devops-ui/List";
+import { IListSelection, ListSelection } from "azure-devops-ui/List";
 import { DetailsPanel, MasterPanel } from "azure-devops-ui/MasterDetails";
 import {
   BaseMasterDetailsContext,
   IMasterDetailsContext,
   IMasterDetailsContextLayer,
-  MasterDetailsContext,
+  MasterDetailsContext
 } from "azure-devops-ui/MasterDetailsContext";
 import * as React from "react";
+import { fieldNames } from "../Common";
 import { showRootComponent } from "../CommonReact";
 import { InitialDetailView } from "./InitialDetailView";
 import { InitialMasterPanelContent } from "./InitialMasterPanelContent";
 import "./VerificationHistory.css";
+import { getVerificationHistory } from "./VerificationHistory.Logic";
 import { emptyVerificationInfo, IVerificationInfo } from "./VerificationInfo";
-import { IObservableArray } from "azure-devops-ui/Core/Observable";
-import { IListSelection } from "azure-devops-ui/List";
-import {
-  IWorkItemFieldChangedArgs,
-  IWorkItemLoadedArgs,
-} from "azure-devops-extension-api/WorkItemTracking";
-import { saveVerificationHistory, getWorkItemUpdates } from "./VerificationHistory.Logic";
-import { fieldNames } from "../Common";
 
 const initialPayload: IMasterDetailsContextLayer<
   IVerificationInfo,
@@ -67,12 +64,7 @@ const registerEvents = (
       onFieldChanged: (args: IWorkItemFieldChangedArgs) => {
         // onSave, revision gets updated
         if (args.changedFields[fieldNames.revision]) {
-          try {
-            //saveVerificationHistory(items, selection);
-            getWorkItemUpdates(items, selection);
-          } catch (err) {
-            console.error("Error saving Verification History: ", err);
-          }
+          getVerificationHistory(items, selection);
         }
       },
     };

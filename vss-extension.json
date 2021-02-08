@@ -1,6 +1,6 @@
 {
   "manifestVersion": 1,
-  "version": "1.0.34",
+  "version": "1.0.35",
   "name": "VERO Biotech ADO Extension",
   "description": "ADO Extension with custom functionality for VERO Biotech.",
   "publisher": "VeroBiotech",
@@ -36,19 +36,7 @@
         "uri": "dist/VerificationHistory/VerificationHistory.html",
         "height": 600,
         "icon": "asset://img/vero-biotech.jpg",
-        "inputs": [{
-            "id": "VerificationHistory",
-            "name": "Field for Verification History",
-            "description": "Select the field that will be mapped to store the full Verification History (compressed). This must be a multi-line field.",
-            "type": "WorkItemField",
-            "properties": {
-              "workItemFieldTypes": ["HTML"]
-            },
-            "validation": {
-              "dataType": "String",
-              "isRequired": true
-            }
-          },
+        "inputs": [
           {
             "id": "VerifiedBy",
             "name": "Field for Verified by",

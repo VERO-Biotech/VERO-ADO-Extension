@@ -80,3 +80,7 @@ export const compareDates = (d1: Date, d2: Date): number => {
     return -1;
   }
 };
+
+export interface IIndexable {
+  [key: string]: any;
+}
