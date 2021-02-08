@@ -67,3 +67,16 @@ export const mapStatus = (status: string): IStatusProps => {
 };
 
 export const dateFormat: string = "MMM DD YYYY, h:mm:ss A";
+
+export const compareDates = (d1: Date, d2: Date): number => {
+  // Check if the dates are equal
+  if (d1.getTime() === d2.getTime()) return 0;
+
+  // Check if the first is greater than second
+  if (d1 > d2) {
+    return 1;
+  } else {
+    // if the first is less than second
+    return -1;
+  }
+};

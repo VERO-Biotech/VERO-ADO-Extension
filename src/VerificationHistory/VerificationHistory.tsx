@@ -23,7 +23,7 @@ import {
   IWorkItemFieldChangedArgs,
   IWorkItemLoadedArgs,
 } from "azure-devops-extension-api/WorkItemTracking";
-import { saveVerificationHistory } from "./VerificationHistory.Logic";
+import { saveVerificationHistory, getWorkItemUpdates } from "./VerificationHistory.Logic";
 import { fieldNames } from "../Common";
 
 const initialPayload: IMasterDetailsContextLayer<
@@ -68,7 +68,8 @@ const registerEvents = (
         // onSave, revision gets updated
         if (args.changedFields[fieldNames.revision]) {
           try {
-            saveVerificationHistory(items, selection);
+            //saveVerificationHistory(items, selection);
+            getWorkItemUpdates(items, selection);
           } catch (err) {
             console.error("Error saving Verification History: ", err);
           }

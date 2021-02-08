@@ -1,6 +1,6 @@
 {
   "manifestVersion": 1,
-  "version": "1.0.30",
+  "version": "1.0.34",
   "name": "VERO Biotech ADO Extension",
   "description": "ADO Extension with custom functionality for VERO Biotech.",
   "publisher": "VeroBiotech",
@@ -113,26 +113,30 @@
         "uri": "dist/FormCustomEvents/FormCustomEvents.html",
         "icon": "asset://img/vero-biotech.jpg",
         "inputs": [{
-          "id": "EnableTaskOrphanCheck",
-          "name": "Tasks always require a parent",
-          "description": "Enable validation for orphaned Tasks Work Item type. Task will always require a parent.",
-          "inputMode": "CheckBox",
-          "validation": {
-            "dataType": "Boolean",
-            "isRequired": false
+            "id": "EnableTaskOrphanCheck",
+            "name": "Tasks always require a parent",
+            "description": "Enable validation for orphaned Tasks Work Item type. Task will always require a parent.",
+            "inputMode": "CheckBox",
+            "validation": {
+              "dataType": "Boolean",
+              "isRequired": false
+            }
+          },
+          {
+            "id": "RequireAreaSelection",
+            "name": "Require users to select Area Path",
+            "description": "Require users to manually select the correct Area Path when creating a new Work Item.",
+            "inputMode": "CheckBox",
+            "validation": {
+              "dataType": "Boolean",
+              "isRequired": false
+            }
           }
-        },
-        {
-          "id": "RequireAreaSelection",
-          "name": "Require users to select Area Path",
-          "description": "Require users to manually select the correct Area Path when creating a new Work Item.",
-          "inputMode": "CheckBox",
-          "validation": {
-            "dataType": "Boolean",
-            "isRequired": false
-          }
-        }]
+        ]
       }
     }
+  ],
+  "scopes": [
+    "vso.work"
   ]
 }
