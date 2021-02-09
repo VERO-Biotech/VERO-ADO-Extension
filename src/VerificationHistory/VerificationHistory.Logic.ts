@@ -18,31 +18,87 @@ import {
 } from "../Common";
 import { IVerificationInfo } from "./VerificationInfo";
 
-export const getVerificationHistory = async (
+const invalidDate = new Date(0);
+const verificationInfoOrder = (a: IVerificationInfo, b: IVerificationInfo) =>
+  -compareDates(a.dateOfVerification, b.dateOfVerification);
+
+// This should be a scoped variable, or refactored into something less brittle.
+let readItems = 0;
+
+export const getInitialWorkItemUpdates = async (
   items: IObservableArray<IVerificationInfo>,
   selection: IListSelection
 ) => {
-  try {
-    await getWorkItemUpdates(items, selection);
-  } catch (err) {
-    console.error("Error reading updates for Verification History.", err);
-  }
+  const lastGoodValue: IVerificationInfo = {
+    build: "",
+    dateOfVerification: invalidDate,
+    details: "",
+    status: "",
+    verifiedBy: "",
+    dateAdded: new Date(),
+  };
+
+  readItems = 0;
+  items.value = await getWorkItemUpdates(lastGoodValue);
+  selection.select(0);
+
+  await SDK.notifyLoadSucceeded();
 };
 
-const invalidDate = new Date(0);
-const maxNumberOfItemsInFetch = 200;
-
-const getWorkItemUpdates = async (
+export const getLatestWorkItemUpdates = async (
   items: IObservableArray<IVerificationInfo>,
   selection: IListSelection
 ) => {
+  if (items.value.length === 0) {
+    return await getInitialWorkItemUpdates(items, selection);
+  }
+  // This assumes that item 0 is the latest entry, if reverse order use items.length - 1.
+  // We need a copy, otherwise values will get replaced in the original element
+  const lastGoodValue = { ...items.value[0] };
+  const latestUpdates = await getWorkItemUpdates(lastGoodValue);
+
+  items.value = items.value
+    .concat(...latestUpdates)
+    .sort(verificationInfoOrder);
+  selection.select(0);
+};
+
+const getWorkItemUpdates = async (lastGoodValue: IVerificationInfo) => {
+  const updates = await fetchUpdates(readItems);
+  readItems += updates.length;
+
+  const verificationInfo = updates
+    .filter(isUpdateFromVerification)
+    .map((x) => transformToVerificationInfo(x));
+
+  verificationInfo.forEach((verification) => {
+    swapWithLastGoodValue(verification, lastGoodValue, "build");
+    swapWithLastGoodValue(verification, lastGoodValue, "dateOfVerification");
+    swapWithLastGoodValue(verification, lastGoodValue, "details");
+    swapWithLastGoodValue(verification, lastGoodValue, "status");
+    swapWithLastGoodValue(verification, lastGoodValue, "verifiedBy");
+  });
+
+  return verificationInfo
+    .filter(filterEmptyVerifications)
+    .sort(verificationInfoOrder);
+};
+
+const fetchUpdates = async (skip: number = 0) => {
+  const workItemFormService = await getWorkItemService();
+  const workItemId = await workItemFormService.getId();
+
+  // If new work item then id is 0
+  if (workItemId === 0) {
+    return <WorkItemUpdate[]>[];
+  }
+
+  const maxNumberOfItemsInFetch = 200;
   const projectService = await SDK.getService<IProjectPageService>(
     CommonServiceIds.ProjectPageService
   );
   const project = await projectService.getProject();
-  const workItemFormService = await getWorkItemService();
   const client = getClient(WorkItemTrackingRestClient);
-  const workItemId = await workItemFormService.getId();
 
   let updates: WorkItemUpdate[] = [];
   let i = 0;
@@ -52,40 +108,13 @@ const getWorkItemUpdates = async (
       workItemId,
       project?.name,
       undefined,
-      i * maxNumberOfItemsInFetch
+      skip + i * maxNumberOfItemsInFetch
     );
     updates = updates.concat(fetchedUpdates);
     i++;
   } while (updates.length / i === maxNumberOfItemsInFetch);
 
-  const verificationHistory = updates
-    .filter(isUpdateFromVerification)
-    .map((x) => transformToVerificationInfo(x));
-
-  const lastGoodValues: IVerificationInfo = {
-    build: "",
-    dateOfVerification: invalidDate,
-    details: "",
-    status: "",
-    verifiedBy: "",
-    dateAdded: new Date(),
-  };
-
-  verificationHistory.forEach((verification) => {
-    swapWithLastGoodValue(verification, lastGoodValues, "build");
-    swapWithLastGoodValue(verification, lastGoodValues, "dateOfVerification");
-    swapWithLastGoodValue(verification, lastGoodValues, "details");
-    swapWithLastGoodValue(verification, lastGoodValues, "status");
-    swapWithLastGoodValue(verification, lastGoodValues, "verifiedBy");
-  });
-
-  items.value = verificationHistory
-    .filter(filterEmptyVerifications)
-    .sort((a, b) => -compareDates(a.dateOfVerification, b.dateOfVerification));
-
-  selection.select(0);
-
-  await SDK.notifyLoadSucceeded();
+  return updates;
 };
 
 const swapWithLastGoodValue = (

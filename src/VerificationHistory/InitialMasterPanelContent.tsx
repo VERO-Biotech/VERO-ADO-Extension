@@ -1,17 +1,23 @@
-import { IObservableArray, IObservableValue } from "azure-devops-ui/Core/Observable";
-import { IListItemDetails, IListSelection, List, ListItem } from "azure-devops-ui/List";
 import {
-  bindSelectionToObservable, MasterDetailsContext
+  IObservableArray,
+  IObservableValue,
+} from "azure-devops-ui/Core/Observable";
+import {
+  IListItemDetails,
+  IListSelection,
+  List,
+  ListItem,
+} from "azure-devops-ui/List";
+import {
+  bindSelectionToObservable,
+  MasterDetailsContext,
 } from "azure-devops-ui/MasterDetailsContext";
-import {
-  Status,
-  StatusSize
-} from "azure-devops-ui/Status";
+import { Status, StatusSize } from "azure-devops-ui/Status";
 import { Tooltip } from "azure-devops-ui/TooltipEx";
 import * as React from "react";
-import Moment from 'react-moment';
+import Moment from "react-moment";
 import { dateFormat, mapStatus } from "../Common";
-import { getVerificationHistory } from "./VerificationHistory.Logic";
+import { getInitialWorkItemUpdates } from "./VerificationHistory.Logic";
 import { IVerificationInfo } from "./VerificationInfo";
 
 const renderInitialRow = (
@@ -40,11 +46,15 @@ const renderInitialRow = (
         >
           <Tooltip overflowOnly={true}>
             <div className="primary-text text-ellipsis">
-              <strong>{item.status}:</strong> {item.build || "Build or version N/A"}
+              <strong>{item.status}:</strong>{" "}
+              {item.build || "Build or version N/A"}
             </div>
           </Tooltip>
           <Tooltip overflowOnly={true}>
-            <div className="primary-text text-ellipsis">{item.verifiedBy} - <Moment date={item.dateOfVerification} format={dateFormat} /></div>
+            <div className="primary-text text-ellipsis">
+              {item.verifiedBy} -{" "}
+              <Moment date={item.dateOfVerification} format={dateFormat} />
+            </div>
           </Tooltip>
         </div>
       </div>
@@ -56,9 +66,13 @@ type InitialMasterPanelProps = {
   initialSelectedMasterItem: IObservableValue<IVerificationInfo>;
   items: IObservableArray<IVerificationInfo>;
   selection: IListSelection;
-}
+};
 
-export const InitialMasterPanelContent: React.FunctionComponent<InitialMasterPanelProps> = ({ initialSelectedMasterItem, items, selection}) => {
+export const InitialMasterPanelContent: React.FunctionComponent<InitialMasterPanelProps> = ({
+  initialSelectedMasterItem,
+  items,
+  selection,
+}) => {
   const masterDetailsContext = React.useContext(MasterDetailsContext);
   const [initialItemProvider] = React.useState(items);
 
@@ -71,7 +85,11 @@ export const InitialMasterPanelContent: React.FunctionComponent<InitialMasterPan
   });
 
   React.useEffect(() => {
-    getVerificationHistory(items, selection);
+    try {
+      getInitialWorkItemUpdates(items, selection);
+    } catch (err) {
+      console.error("Error getting the work item updates (initial load)", err);
+    }
   }, []);
 
   return (
@@ -81,9 +99,7 @@ export const InitialMasterPanelContent: React.FunctionComponent<InitialMasterPan
       selection={selection}
       renderRow={renderInitialRow}
       width="100%"
-      onSelect={() =>
-        masterDetailsContext.setDetailsPanelVisbility(true)
-      }
+      onSelect={() => masterDetailsContext.setDetailsPanelVisbility(true)}
     />
   );
 };

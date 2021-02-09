@@ -3,7 +3,7 @@ import * as SDK from "azure-devops-extension-sdk";
 import {
   IObservableArray,
   ObservableArray,
-  ObservableValue
+  ObservableValue,
 } from "azure-devops-ui/Core/Observable";
 import { IListSelection, ListSelection } from "azure-devops-ui/List";
 import { DetailsPanel, MasterPanel } from "azure-devops-ui/MasterDetails";
@@ -11,7 +11,7 @@ import {
   BaseMasterDetailsContext,
   IMasterDetailsContext,
   IMasterDetailsContextLayer,
-  MasterDetailsContext
+  MasterDetailsContext,
 } from "azure-devops-ui/MasterDetailsContext";
 import * as React from "react";
 import { fieldNames } from "../Common";
@@ -19,7 +19,7 @@ import { showRootComponent } from "../CommonReact";
 import { InitialDetailView } from "./InitialDetailView";
 import { InitialMasterPanelContent } from "./InitialMasterPanelContent";
 import "./VerificationHistory.css";
-import { getVerificationHistory } from "./VerificationHistory.Logic";
+import { getLatestWorkItemUpdates } from "./VerificationHistory.Logic";
 import { emptyVerificationInfo, IVerificationInfo } from "./VerificationInfo";
 
 const initialPayload: IMasterDetailsContextLayer<
@@ -63,7 +63,11 @@ const registerEvents = (
       onFieldChanged: (args: IWorkItemFieldChangedArgs) => {
         // onSave, revision gets updated
         if (args.changedFields[fieldNames.revision]) {
-          getVerificationHistory(items, selection);
+          try {
+            getLatestWorkItemUpdates(items, selection);
+          } catch (err) {
+            console.error("Error getting the latest Work Item updates", err);
+          }
         }
       },
     };
@@ -86,7 +90,7 @@ const selection = new ListSelection({ selectOnFocus: false });
 class VerificationHistoryComponent extends React.Component<{}, {}> {
   constructor(prop: {} | Readonly<{}>) {
     super(prop);
-    
+
     SDK.init({ loaded: false }).then(() => {
       readConfigValues();
       registerEvents(items, selection);
