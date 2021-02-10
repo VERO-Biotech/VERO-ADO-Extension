@@ -19,7 +19,7 @@ import { showRootComponent } from "../CommonReact";
 import { InitialDetailView } from "./InitialDetailView";
 import { InitialMasterPanelContent } from "./InitialMasterPanelContent";
 import "./VerificationHistory.css";
-import { getLatestWorkItemUpdates } from "./VerificationHistory.Logic";
+import { getVerificationHistory } from "./VerificationHistory.Logic";
 import { emptyVerificationInfo, IVerificationInfo } from "./VerificationInfo";
 
 const initialPayload: IMasterDetailsContextLayer<
@@ -61,10 +61,12 @@ const registerEvents = (
     return {
       // Called when the active work item is modified
       onFieldChanged: (args: IWorkItemFieldChangedArgs) => {
+        console.log("Changed fields", args);
+
         // onSave, revision gets updated
         if (args.changedFields[fieldNames.revision]) {
           try {
-            getLatestWorkItemUpdates(items, selection);
+            getVerificationHistory(items, selection);
           } catch (err) {
             console.error("Error getting the latest Work Item updates", err);
           }

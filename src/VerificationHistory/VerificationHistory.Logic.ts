@@ -19,16 +19,52 @@ import {
 import { IVerificationInfo } from "./VerificationInfo";
 
 const invalidDate = new Date(0);
-const verificationInfoOrder = (a: IVerificationInfo, b: IVerificationInfo) =>
-  -compareDates(a.dateOfVerification, b.dateOfVerification);
 
-// This should be a scoped variable, or refactored into something less brittle.
-let readItems = 0;
+const verificationInfoOrder = (a: IVerificationInfo, b: IVerificationInfo) => {
+  const dateOfVerificationResult = -compareDates(
+    a.dateOfVerification,
+    b.dateOfVerification
+  );
+
+  if (dateOfVerificationResult === 0) {
+    return b.index - a.index;
+  } else {
+    return dateOfVerificationResult;
+  }
+};
+
+interface IVerificationHistoryContext {
+  updates: WorkItemUpdate[];
+}
+
+const context: IVerificationHistoryContext = {
+  updates: [],
+};
 
 export const getInitialWorkItemUpdates = async (
   items: IObservableArray<IVerificationInfo>,
   selection: IListSelection
 ) => {
+  await getVerificationHistory(items, selection);
+  await SDK.notifyLoadSucceeded();
+};
+
+export const getVerificationHistory = async (
+  items: IObservableArray<IVerificationInfo>,
+  selection: IListSelection
+) => {
+  items.value = await getWorkItemUpdates();
+  selection.select(0);
+};
+
+const getWorkItemUpdates = async () => {
+  const updates = await fetchUpdates(context.updates.length);
+  context.updates.push(...updates);
+
+  const verificationInfo = context.updates
+    .filter(isUpdateFromVerification)
+    .map((x) => transformToVerificationInfo(x));
+
   const lastGoodValue: IVerificationInfo = {
     build: "",
     dateOfVerification: invalidDate,
@@ -36,40 +72,8 @@ export const getInitialWorkItemUpdates = async (
     status: "",
     verifiedBy: "",
     dateAdded: new Date(),
+    index: -1,
   };
-
-  readItems = 0;
-  items.value = await getWorkItemUpdates(lastGoodValue);
-  selection.select(0);
-
-  await SDK.notifyLoadSucceeded();
-};
-
-export const getLatestWorkItemUpdates = async (
-  items: IObservableArray<IVerificationInfo>,
-  selection: IListSelection
-) => {
-  if (items.value.length === 0) {
-    return await getInitialWorkItemUpdates(items, selection);
-  }
-  // This assumes that item 0 is the latest entry, if reverse order use items.length - 1.
-  // We need a copy, otherwise values will get replaced in the original element
-  const lastGoodValue = { ...items.value[0] };
-  const latestUpdates = await getWorkItemUpdates(lastGoodValue);
-
-  items.value = items.value
-    .concat(...latestUpdates)
-    .sort(verificationInfoOrder);
-  selection.select(0);
-};
-
-const getWorkItemUpdates = async (lastGoodValue: IVerificationInfo) => {
-  const updates = await fetchUpdates(readItems);
-  readItems += updates.length;
-
-  const verificationInfo = updates
-    .filter(isUpdateFromVerification)
-    .map((x) => transformToVerificationInfo(x));
 
   verificationInfo.forEach((verification) => {
     swapWithLastGoodValue(verification, lastGoodValue, "build");
@@ -93,26 +97,27 @@ const fetchUpdates = async (skip: number = 0) => {
     return <WorkItemUpdate[]>[];
   }
 
-  const maxNumberOfItemsInFetch = 200;
+  const maxItemsInFetch = 200;
   const projectService = await SDK.getService<IProjectPageService>(
     CommonServiceIds.ProjectPageService
   );
   const project = await projectService.getProject();
   const client = getClient(WorkItemTrackingRestClient);
 
-  let updates: WorkItemUpdate[] = [];
+  const updates: WorkItemUpdate[] = [];
   let i = 0;
 
   do {
     const fetchedUpdates = await client.getUpdates(
       workItemId,
       project?.name,
-      undefined,
-      skip + i * maxNumberOfItemsInFetch
+      maxItemsInFetch,
+      skip + i * maxItemsInFetch
     );
-    updates = updates.concat(fetchedUpdates);
+
+    updates.push(...fetchedUpdates);
     i++;
-  } while (updates.length / i === maxNumberOfItemsInFetch);
+  } while (updates.length / i === maxItemsInFetch);
 
   return updates;
 };
@@ -152,6 +157,7 @@ const transformToVerificationInfo = (update: WorkItemUpdate) => {
     details: update.fields[fieldNames.details]?.newValue,
     status: update.fields[fieldNames.status]?.newValue,
     verifiedBy: update.fields[fieldNames.verifiedBy]?.newValue?.displayName,
+    index: update.id,
   };
 };
 

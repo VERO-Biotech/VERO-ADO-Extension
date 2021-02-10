@@ -5,6 +5,7 @@ export interface IVerificationInfo {
   details: string;
   build: string;
   dateAdded: Date;
+  index: number;
 }
 
 export const emptyVerificationInfo: IVerificationInfo[] = [];
