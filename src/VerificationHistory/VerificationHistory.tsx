@@ -61,8 +61,6 @@ const registerEvents = (
     return {
       // Called when the active work item is modified
       onFieldChanged: (args: IWorkItemFieldChangedArgs) => {
-        console.log("Changed fields", args);
-
         // onSave, revision gets updated
         if (args.changedFields[fieldNames.revision]) {
           try {
