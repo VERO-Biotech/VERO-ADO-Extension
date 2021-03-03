@@ -9,6 +9,7 @@ import {
   taskParentValidationClearErrors,
 } from "./TaskParentValidation";
 import { getCustomEventSettings } from "./CustomEventSettings";
+import { reorderNewWorkItem } from "./ReorderNewWorkItems";
 
 const registerEvents = () => {
   const settings = getCustomEventSettings();
@@ -17,6 +18,8 @@ const registerEvents = () => {
     return {
       // Called when the active work item is modified
       onFieldChanged: (args: IWorkItemFieldChangedArgs) => {
+        reorderNewWorkItem(args);
+
         if (settings.taskParentValidationOn) {
           taskParentValidationClearErrors(args);
           // Need to also validate on field change for Parent removal scenario

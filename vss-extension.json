@@ -1,6 +1,6 @@
 {
   "manifestVersion": 1,
-  "version": "1.0.37",
+  "version": "1.0.44",
   "name": "VERO Biotech ADO Extension",
   "description": "ADO Extension with custom functionality for VERO Biotech.",
   "publisher": "VeroBiotech",
@@ -125,6 +125,6 @@
     }
   ],
   "scopes": [
-    "vso.work"
+    "vso.work_write"
   ]
 }

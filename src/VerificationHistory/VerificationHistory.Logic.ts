@@ -1,8 +1,4 @@
-import {
-  CommonServiceIds,
-  getClient,
-  IProjectPageService,
-} from "azure-devops-extension-api";
+import { getClient } from "azure-devops-extension-api";
 import {
   WorkItemTrackingRestClient,
   WorkItemUpdate,
@@ -14,6 +10,7 @@ import {
   compareDates,
   fieldNames,
   getWorkItemService,
+  getProjectService,
   IIndexable,
 } from "../Common";
 import { IVerificationInfo } from "./VerificationInfo";
@@ -98,9 +95,8 @@ const fetchUpdates = async (skip: number = 0) => {
   }
 
   const maxItemsInFetch = 200;
-  const projectService = await SDK.getService<IProjectPageService>(
-    CommonServiceIds.ProjectPageService
-  );
+
+  const projectService = await getProjectService();
   const project = await projectService.getProject();
   const client = getClient(WorkItemTrackingRestClient);
 

@@ -4,10 +4,20 @@ import {
 } from "azure-devops-extension-api/WorkItemTracking";
 import * as SDK from "azure-devops-extension-sdk";
 import { IStatusProps, Statuses } from "azure-devops-ui/Status";
+import {
+  CommonServiceIds,
+  IProjectPageService,
+} from "azure-devops-extension-api";
 
 export const getWorkItemService = async () => {
   return await SDK.getService<IWorkItemFormService>(
     WorkItemTrackingServiceIds.WorkItemFormService
+  );
+};
+
+export const getProjectService = async () => {
+  return await SDK.getService<IProjectPageService>(
+    CommonServiceIds.ProjectPageService
   );
 };
 
@@ -22,6 +32,7 @@ export interface IFieldNames {
   workItemType: string;
   integrationBuild: string;
   areaPath: string;
+  id: string;
 }
 
 export const fieldNames: IFieldNames = {
@@ -35,6 +46,7 @@ export const fieldNames: IFieldNames = {
   workItemType: "System.WorkItemType",
   integrationBuild: "Microsoft.VSTS.Build.IntegrationBuild",
   areaPath: "System.AreaPath",
+  id: "System.Id",
 };
 
 export interface IWorkItemTypes {
