@@ -8,6 +8,7 @@ import { RadioButton, RadioButtonGroup } from "azure-devops-ui/RadioButton";
 import * as React from "react";
 import { getProjectService, fieldNames } from "../Common";
 import { showRootComponent } from "../CommonReact";
+import { GroupedItemProvider } from "azure-devops-ui/Utilities/GroupedItemProvider";
 import {
   Backlog,
   StateMapping,
@@ -29,6 +30,10 @@ class ReorderBacklogWorkItems extends React.Component<{}, {}> {
   private project = new ObservableValue<string>("");
   private sortDirection = new ObservableValue<string>("asc");
 
+  private teamsProvider = new GroupedItemProvider([], [], false);
+  private backlogsProvider = new GroupedItemProvider([], [], false);
+  private columnsProvider = new GroupedItemProvider([], [], false);
+
   constructor(prop: {} | Readonly<{}>) {
     super(prop);
 
@@ -41,20 +46,7 @@ class ReorderBacklogWorkItems extends React.Component<{}, {}> {
       }
       this.project.value = projectInfo.name;
 
-      const teams = await getTeams(this.project.value);
-      this.team.value = teams[1];
-
-      const backlogs = await getBacklogs(this.project.value, this.team.value);
-      this.backlog.value = backlogs[1];
-
-      const boardCols = await getBoardColumns(
-        this.project.value,
-        this.team.value,
-        this.backlog.value.name
-      );
-
-      this.boardColumns.value = boardCols;
-      this.column.value = boardCols.keys().next().value;
+      await this.reloadTeams();
     });
   }
 
@@ -67,11 +59,7 @@ class ReorderBacklogWorkItems extends React.Component<{}, {}> {
               ariaLabel="Basic"
               className="example-dropdown"
               placeholder="Select the Team that owns the Board"
-              items={[
-                { id: "ExtensionTest Team", text: "ExtensionTest Team" },
-                { id: "Test", text: "Test" },
-                { id: "Trauma Team", text: "Trauma Team" },
-              ]}
+              items={this.teamsProvider}
               onSelect={this.onSelectTeam}
             />
           </FormItem>
@@ -82,11 +70,7 @@ class ReorderBacklogWorkItems extends React.Component<{}, {}> {
               ariaLabel="Basic"
               className="example-dropdown"
               placeholder="Select a Team Board"
-              items={[
-                { id: "Microsoft.RequirementCategory", text: "Requirements2" },
-                { id: "Microsoft.FeatureCategory", text: "Features" },
-                { id: "Microsoft.EpicCategory", text: "Epics" },
-              ]}
+              items={this.backlogsProvider}
               onSelect={this.onSelectBacklog}
             />
           </FormItem>
@@ -97,11 +81,7 @@ class ReorderBacklogWorkItems extends React.Component<{}, {}> {
               ariaLabel="Basic"
               className="example-dropdown"
               placeholder="Select a Board Column to Reorder"
-              items={[
-                { id: "Proposed", text: "Proposed" },
-                { id: "Active", text: "Active" },
-                { id: "Resolved", text: "Resolved" },
-              ]}
+              items={this.columnsProvider}
               onSelect={this.onSelectColumn}
             />
           </FormItem>
@@ -129,18 +109,20 @@ class ReorderBacklogWorkItems extends React.Component<{}, {}> {
     );
   }
 
-  private onSelectTeam = (
+  private onSelectTeam = async (
     event: React.SyntheticEvent<HTMLElement>,
     item: IListBoxItem<{}>
   ) => {
     this.team.value = item.text || "";
+    await this.reloadBacklogs();
   };
 
-  private onSelectBacklog = (
+  private onSelectBacklog = async (
     event: React.SyntheticEvent<HTMLElement>,
     item: IListBoxItem<{}>
   ) => {
     this.backlog.value = { id: item.id, name: item.text || "" };
+    await this.reloadColumns();
   };
 
   private onSelectColumn = (
@@ -165,6 +147,10 @@ class ReorderBacklogWorkItems extends React.Component<{}, {}> {
       this.backlog.value.id
     );
 
+    if (backlogItems.length === 0) {
+      return;
+    }
+
     const workItemIds = await getWorkItemsByState({
       project: this.project.value,
       team: this.team.value,
@@ -176,8 +162,55 @@ class ReorderBacklogWorkItems extends React.Component<{}, {}> {
 
     console.log("Work items to Reorder", workItemIds);
 
+    if (workItemIds.length === 0) {
+      return;
+    }
+
     await reorderBacklogWorkItems(workItemIds, this.project.value, this.team.value);
   };
+
+  private reloadTeams = async() => {
+    const teams = await getTeams(this.project.value);
+    this.team.value = teams[1];
+
+    this.teamsProvider.removeAll();
+
+    teams.forEach(x => {
+      this.teamsProvider.push({id: x, text: x});
+    });
+
+    await this.reloadBacklogs();
+  }
+
+  private reloadBacklogs = async() => {
+    const backlogs = await getBacklogs(this.project.value, this.team.value);
+    this.backlog.value = backlogs[1];
+
+    this.backlogsProvider.removeAll();
+
+    backlogs.forEach(x => {
+      this.backlogsProvider.push({id: x.id, text: x.name});
+    })
+
+    await this.reloadColumns();
+  }
+
+  private reloadColumns = async() => {
+    const boardCols = await getBoardColumns(
+      this.project.value,
+      this.team.value,
+      this.backlog.value.name
+    );
+
+    this.boardColumns.value = boardCols;
+    this.column.value = boardCols.keys().next().value;
+
+    this.columnsProvider.removeAll();
+
+    boardCols.forEach((stateMapping, column) => {
+      this.columnsProvider.push({id: column, text: column});
+    })
+  }
 }
 
 showRootComponent(<ReorderBacklogWorkItems />);
