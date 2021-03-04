@@ -1,0 +1,16 @@
+.reorder-items-page {
+    padding-left: 8px;
+}
+
+.reorder-items-page .page-content {
+    padding-left: 8px;
+}
+
+.reorder-items-page .header {
+    padding-left: 0px;
+    margin-left: 8px;
+}
+
+.reorder-items-page .bolt-textfield {
+    min-width: 250px;
+}

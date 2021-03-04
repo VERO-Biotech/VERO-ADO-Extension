@@ -3,21 +3,25 @@ import { Button } from "azure-devops-ui/Button";
 import { ObservableValue } from "azure-devops-ui/Core/Observable";
 import { Dropdown } from "azure-devops-ui/Dropdown";
 import { FormItem } from "azure-devops-ui/FormItem";
+import { Header, TitleSize } from "azure-devops-ui/Header";
 import { IListBoxItem } from "azure-devops-ui/ListBox";
+import { Observer } from "azure-devops-ui/Observer";
+import { Page } from "azure-devops-ui/Page";
 import { RadioButton, RadioButtonGroup } from "azure-devops-ui/RadioButton";
-import * as React from "react";
-import { getProjectService, fieldNames } from "../Common";
-import { showRootComponent } from "../CommonReact";
 import { GroupedItemProvider } from "azure-devops-ui/Utilities/GroupedItemProvider";
+import * as React from "react";
+import { fieldNames, getProjectService } from "../Common";
+import { showRootComponent } from "../CommonReact";
+import "./ReorderBacklogWorkItems.css";
 import {
   Backlog,
-  StateMapping,
   getBacklogs,
   getBacklogWorkItems,
   getBoardColumns,
   getTeams,
   getWorkItemsByState,
-  reorderBacklogWorkItems
+  reorderBacklogWorkItems,
+  StateMapping,
 } from "./ReorderBacklogWorkItems.Logic";
 
 class ReorderBacklogWorkItems extends React.Component<{}, {}> {
@@ -52,60 +56,88 @@ class ReorderBacklogWorkItems extends React.Component<{}, {}> {
 
   public render(): JSX.Element {
     return (
-      <div className="flex-column margin-8">
-        <div className="flex-row margin-8">
-          <FormItem label="Team">
-            <Dropdown
-              ariaLabel="Basic"
-              className="example-dropdown"
-              placeholder="Select the Team that owns the Board"
-              items={this.teamsProvider}
-              onSelect={this.onSelectTeam}
-            />
-          </FormItem>
+      <Page className="reorder-items-page">
+        <Header
+          title="Reorder Board Work Items"
+          titleSize={TitleSize.Large}
+          className="header"
+        />
+        <div className="page-content">
+          <div className="flex-column margin-vertical-8">
+            <div className="flex-row margin-vertical-8">
+              <FormItem label="Team">
+                <Dropdown
+                  ariaLabel="Basic"
+                  className="example-dropdown"
+                  placeholder="Select the Team that owns the Board"
+                  items={this.teamsProvider}
+                  onSelect={this.onSelectTeam}
+                />
+              </FormItem>
+            </div>
+            <div className="flex-row margin-vertical-8">
+              <FormItem label="Board">
+                <Dropdown
+                  ariaLabel="Basic"
+                  className="example-dropdown"
+                  placeholder="Select a Team Board"
+                  items={this.backlogsProvider}
+                  onSelect={this.onSelectBacklog}
+                />
+              </FormItem>
+            </div>
+            <div className="flex-row margin-vertical-8">
+              <FormItem label="Column">
+                <Dropdown
+                  ariaLabel="Basic"
+                  className="example-dropdown"
+                  placeholder="Select a Board Column to reorder"
+                  items={this.columnsProvider}
+                  onSelect={this.onSelectColumn}
+                />
+              </FormItem>
+            </div>
+            <div className="flex-row margin-vertical-8">
+              <RadioButtonGroup
+                onSelect={(selectedId) =>
+                  (this.sortDirection.value = selectedId)
+                }
+                selectedButtonId={this.sortDirection}
+                text={"Sort direction"}
+              >
+                <RadioButton id="asc" text="Ascending" key="asc" />
+                <RadioButton id="desc" text="Descending" key="desc" />
+              </RadioButtonGroup>
+            </div>
+            <div className="flex-row margin-vertical-8">
+              <Observer
+                team={this.team}
+                backlog={this.backlog}
+                column={this.column}
+              >
+                {(props: {
+                  team: string;
+                  backlog: Backlog;
+                  column: string;
+                }) => {
+                  return (
+                    <Button
+                      text="Reorder Work Items"
+                      primary={true}
+                      onClick={this.onReorderClick}
+                      disabled={
+                        props.team.length === 0 ||
+                        props.backlog.id.length === 0 ||
+                        props.column.length === 0
+                      }
+                    />
+                  );
+                }}
+              </Observer>
+            </div>
+          </div>
         </div>
-        <div className="flex-row margin-8">
-          <FormItem label="Board">
-            <Dropdown
-              ariaLabel="Basic"
-              className="example-dropdown"
-              placeholder="Select a Team Board"
-              items={this.backlogsProvider}
-              onSelect={this.onSelectBacklog}
-            />
-          </FormItem>
-        </div>
-        <div className="flex-row margin-8">
-          <FormItem label="Column">
-            <Dropdown
-              ariaLabel="Basic"
-              className="example-dropdown"
-              placeholder="Select a Board Column to Reorder"
-              items={this.columnsProvider}
-              onSelect={this.onSelectColumn}
-            />
-          </FormItem>
-        </div>
-        <div className="flex-row margin-8">
-          <RadioButtonGroup
-            onSelect={(selectedId) =>
-              (this.sortDirection.value = selectedId)
-            }
-            selectedButtonId={this.sortDirection}
-            text={"Sort direction"}
-          >
-            <RadioButton id="asc" text="Ascending" key="asc" />
-            <RadioButton id="desc" text="Descending" key="desc" />
-          </RadioButtonGroup>
-        </div>
-        <div className="flex-row margin-8">
-          <Button
-            text="Reorder Work Items"
-            primary={true}
-            onClick={this.onReorderClick}
-          />
-        </div>
-      </div>
+      </Page>
     );
   }
 
@@ -166,36 +198,39 @@ class ReorderBacklogWorkItems extends React.Component<{}, {}> {
       return;
     }
 
-    await reorderBacklogWorkItems(workItemIds, this.project.value, this.team.value);
+    await reorderBacklogWorkItems(
+      workItemIds,
+      this.project.value,
+      this.team.value
+    );
   };
 
-  private reloadTeams = async() => {
+  private reloadTeams = async () => {
     const teams = await getTeams(this.project.value);
-    this.team.value = teams[1];
+    this.team.value = "";
 
     this.teamsProvider.removeAll();
+    this.backlogsProvider.removeAll();
+    this.columnsProvider.removeAll();
 
-    teams.forEach(x => {
-      this.teamsProvider.push({id: x, text: x});
+    teams.forEach((x) => {
+      this.teamsProvider.push({ id: x, text: x });
     });
+  };
 
-    await this.reloadBacklogs();
-  }
-
-  private reloadBacklogs = async() => {
+  private reloadBacklogs = async () => {
     const backlogs = await getBacklogs(this.project.value, this.team.value);
-    this.backlog.value = backlogs[1];
+    this.backlog.value = { id: "", name: "" };
 
     this.backlogsProvider.removeAll();
+    this.columnsProvider.removeAll();
 
-    backlogs.forEach(x => {
-      this.backlogsProvider.push({id: x.id, text: x.name});
-    })
+    backlogs.forEach((x) => {
+      this.backlogsProvider.push({ id: x.id, text: x.name });
+    });
+  };
 
-    await this.reloadColumns();
-  }
-
-  private reloadColumns = async() => {
+  private reloadColumns = async () => {
     const boardCols = await getBoardColumns(
       this.project.value,
       this.team.value,
@@ -203,14 +238,14 @@ class ReorderBacklogWorkItems extends React.Component<{}, {}> {
     );
 
     this.boardColumns.value = boardCols;
-    this.column.value = boardCols.keys().next().value;
+    this.column.value = "";
 
     this.columnsProvider.removeAll();
 
-    boardCols.forEach((stateMapping, column) => {
-      this.columnsProvider.push({id: column, text: column});
-    })
-  }
+    boardCols.forEach((_stateMapping, column) => {
+      this.columnsProvider.push({ id: column, text: column });
+    });
+  };
 }
 
 showRootComponent(<ReorderBacklogWorkItems />);
