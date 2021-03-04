@@ -33,6 +33,8 @@ export interface IFieldNames {
   integrationBuild: string;
   areaPath: string;
   id: string;
+  createdDate: string;
+  changedDate: string;
 }
 
 export const fieldNames: IFieldNames = {
@@ -47,6 +49,8 @@ export const fieldNames: IFieldNames = {
   integrationBuild: "Microsoft.VSTS.Build.IntegrationBuild",
   areaPath: "System.AreaPath",
   id: "System.Id",
+  createdDate: "System.CreatedDate",
+  changedDate: "System.ChangedDate",
 };
 
 export interface IWorkItemTypes {

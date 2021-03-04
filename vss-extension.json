@@ -1,6 +1,6 @@
 {
   "manifestVersion": 1,
-  "version": "1.0.44",
+  "version": "1.0.46",
   "name": "VERO Biotech ADO Extension",
   "description": "ADO Extension with custom functionality for VERO Biotech.",
   "publisher": "VeroBiotech",
@@ -36,8 +36,7 @@
         "uri": "dist/VerificationHistory/VerificationHistory.html",
         "height": 600,
         "icon": "asset://img/vero-biotech.jpg",
-        "inputs": [
-          {
+        "inputs": [{
             "id": "VerifiedBy",
             "name": "Field for Verified by",
             "description": "Select the field that will be mapped for Verified by. This must be an identity (user) field.",
@@ -121,6 +120,20 @@
             }
           }
         ]
+      }
+    },
+    {
+      "id": "reorder-backlog-work-items",
+      "type": "ms.vss-web.tab",
+      "description": "Allows reordering of Backlog Work Items",
+      "targets": [
+        "ms.vss-work-web.product-backlog-tabs"
+      ],
+      "properties": {
+        "uri": "dist/ReorderBacklogWorkItems/ReorderBacklogWorkItems.html",
+        "title": "Reorder Items",
+        "name": "Reorder Items",
+        "registeredObjectId": "reorderItems"
       }
     }
   ],
