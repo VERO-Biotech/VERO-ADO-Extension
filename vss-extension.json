@@ -1,6 +1,6 @@
 {
   "manifestVersion": 1,
-  "version": "1.0.46",
+  "version": "1.0.47",
   "name": "VERO Biotech ADO Extension",
   "description": "ADO Extension with custom functionality for VERO Biotech.",
   "publisher": "VeroBiotech",
@@ -113,6 +113,16 @@
             "id": "RequireAreaSelection",
             "name": "Require users to select Area Path",
             "description": "Require users to manually select the correct Area Path when creating a new Work Item.",
+            "inputMode": "CheckBox",
+            "validation": {
+              "dataType": "Boolean",
+              "isRequired": false
+            }
+          },
+          {
+            "id": "ReorderNewItem",
+            "name": "Reorder new Work Items to the top",
+            "description": "Reorder any new Work Item to appear at the top of the Board/Backlog.",
             "inputMode": "CheckBox",
             "validation": {
               "dataType": "Boolean",

@@ -3,6 +3,7 @@ import * as SDK from "azure-devops-extension-sdk";
 export interface ICustomEventSettings {
   taskParentValidationOn: boolean;
   requireAreaSelectionOn: boolean;
+  reorderNewItemOn: boolean;
 }
 
 export const getCustomEventSettings = (): ICustomEventSettings => {
@@ -12,5 +13,6 @@ export const getCustomEventSettings = (): ICustomEventSettings => {
   return {
     taskParentValidationOn: config.EnableTaskOrphanCheck,
     requireAreaSelectionOn: config.RequireAreaSelection,
+    reorderNewItemOn: config.ReorderNewItem
   };
 };

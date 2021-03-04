@@ -18,7 +18,9 @@ const registerEvents = () => {
     return {
       // Called when the active work item is modified
       onFieldChanged: (args: IWorkItemFieldChangedArgs) => {
-        reorderNewWorkItem(args);
+        if (settings.reorderNewItemOn) {
+          reorderNewWorkItem(args);
+        }
 
         if (settings.taskParentValidationOn) {
           taskParentValidationClearErrors(args);
