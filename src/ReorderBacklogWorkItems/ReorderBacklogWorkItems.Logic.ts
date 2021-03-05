@@ -43,8 +43,6 @@ export const getBacklogs = async (project: string, team: string) => {
     .filter((x) => !x.isHidden && x.type !== BacklogType.Task)
     .map((x) => <Backlog>{ id: x.id, name: x.name });
 
-  console.log("getBacklogs", backlogs);
-
   return backlogs;
 };
 
@@ -57,13 +55,9 @@ export const getBoardColumns = async (
   const teamContext = getTeamContext(project, team);
   const board = await workClient.getBoard(teamContext, backlog);
 
-  console.log("getBoard", board);
-
   const columns: Map<string, StateMapping> = new Map();
 
   board.columns.forEach((x) => columns.set(x.name, x.stateMappings));
-
-  console.log(columns);
 
   return columns;
 };
@@ -71,8 +65,6 @@ export const getBoardColumns = async (
 export const getTeams = async (project: string) => {
   const coreClient = getClient(CoreRestClient);
   const teams = await coreClient.getTeams(project, true);
-
-  console.log("getTeams", teams);
 
   return teams.map((x) => x.name);
 };
@@ -89,8 +81,6 @@ export const getBacklogWorkItems = async (
     teamContext,
     backlogId
   );
-
-  console.log("getBacklogWorkItems", result);
 
   return result.workItems.map((x) => x.target.id);
 };
@@ -124,8 +114,6 @@ const getWorkItemsByWiql = async (
     project,
     team
   );
-
-  console.log("Work Items", result.workItems);
 
   return result.workItems.map((x) => x.id);
 };

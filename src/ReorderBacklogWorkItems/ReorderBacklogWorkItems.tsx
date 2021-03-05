@@ -171,8 +171,6 @@ class ReorderBacklogWorkItems extends React.Component<{}, {}> {
       return;
     }
 
-    console.log("State mapping", stateMapping);
-
     const backlogItems = await getBacklogWorkItems(
       this.project.value,
       this.team.value,
@@ -191,8 +189,6 @@ class ReorderBacklogWorkItems extends React.Component<{}, {}> {
       sortBy: fieldNames.createdDate,
       sortDirection: this.sortDirection.value,
     });
-
-    console.log("Work items to Reorder", workItemIds);
 
     if (workItemIds.length === 0) {
       return;
